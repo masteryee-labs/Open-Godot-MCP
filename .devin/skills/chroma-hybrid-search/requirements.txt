@@ -1,0 +1,9 @@
+# Chroma Hybrid Search dependencies
+# Install into ~/.deep-memory/.venv with:
+#   <PY> -m pip install -r .devin/skills/chroma-hybrid-search/requirements.txt
+
+chromadb>=0.5.0
+sentence-transformers>=2.7.0
+onnxruntime>=1.17.0
+rank-bm25>=0.2.2
+requests>=2.31.0

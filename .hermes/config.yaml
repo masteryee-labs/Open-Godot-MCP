@@ -1,0 +1,10 @@
+hooks:
+  - event: pre_tool_call
+    command: "python .hermes/hooks/pre_tool_use.py"
+    timeout: 10
+  - event: post_tool_call
+    command: "python .hermes/hooks/post_tool_use.py"
+    timeout: 10
+  - event: on_session_end
+    command: "python .hermes/hooks/stop.py"
+    timeout: 10
