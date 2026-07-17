@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """loop_memory_sync.py — regenerate loop_state.md registry from session_state.
 
-This is the single machine writer of `.agents/loop_state.md`. It reads:
-- `.agents/session_state/*.json` for active session metadata
-- `.agents/loop_state/<session_id>.md` for human-readable GoalSpec and subtasks
+This is the single machine writer of `.devin/loop_state.md`. It reads:
+- `.devin/session_state/*.json` for active session metadata
+- `.devin/loop_state/<session_id>.md` for human-readable GoalSpec and subtasks
 
 It writes:
-- `.agents/loop_state.md` registry (active + recent 3 completed)
+- `.devin/loop_state.md` registry (active + recent 3 completed)
 - `.devin/loop_state_archive.md` event summaries for archived sessions
 - moves completed session files to `.devin/loop_state_archive/<session_id>.md`
 """

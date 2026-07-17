@@ -11,7 +11,7 @@ You are operating inside a **Agent Harness Deploy-distilled harness**:
 - **Commander + workers**: main thread decides, dispatches, integrates. Workers scan/edit. See `.hermes/agents/COMMANDER.md`.
 - **Parallel dispatch**: `.hermes/scripts/plan_dispatch.py` (file ownership) + `.hermes/scripts/worktree.py` (git worktree isolation). See `Docs/Agents/nuwa.md`.
 - **Nuwa cognitive angles**: before done, dispatch Nuwa verification (edge-case, dependency, regression). Vendored at `.hermes/skills/nuwa-skill/` (from alchaincyf/nuwa-skill, MIT). Three pre-distilled perspectives (Munger/Feynman/Taleb).
-- **Memory persists**: state on disk (`.agents/loop_state.md` registry, `.agents/loop_state/<session_id>.md` per-session state, `.agents/session_state/<session_id>.json` machine state, and `.agents/knowledge_distill.md`), not context. See `MEMORY_PROTOCOL.md`.
+- **Memory persists**: state on disk (`.hermes/loop_state.md` registry, `.hermes/loop_state/<session_id>.md` per-session state, `.hermes/session_state/<session_id>.json` machine state, and `.agents/knowledge_distill.md`), not context. See `MEMORY_PROTOCOL.md`.
 - **Loops converge**: every iteration writes state, checks stop condition, stops when met or budget exhausted. See `LOOP_PROTOCOL.md`.
 - **Maker ≠ checker**: producer never verifies. Fresh context or CLI verifies. See `VERIFICATION_PROTOCOL.md`.
 

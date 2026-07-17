@@ -20,7 +20,7 @@ At scope change, at iteration 5, and before the session ends.
 
 1. Call `python .codex/scripts/memory_audit.py --session <session_id>`.
 2. The script does the following:
-   - Read `.agents/session_state/<session_id>/candidate_memory.jsonl`.
+   - Read `.codex/session_state/<session_id>/candidate_memory.jsonl`.
    - For each candidate, check:
      - Does it have a clear trigger? (e.g., "file path with spaces in exec causes shell parse error")
      - Does it have a correct action? (e.g., "quote the path with double quotes")
@@ -34,7 +34,7 @@ At scope change, at iteration 5, and before the session ends.
      - merge duplicates
      - abstract concrete paths into patterns
      - archive evicted entries to `.codex/loop_state_archive.md`
-   - Clear the processed candidates from `.agents/session_state/<session_id>/candidate_memory.jsonl`.
+   - Clear the processed candidates from `.codex/session_state/<session_id>/candidate_memory.jsonl`.
 3. You may also read the audit output from the script and append any high-level judgment to `.agents/handoff_letter.md`.
 
 ## Output

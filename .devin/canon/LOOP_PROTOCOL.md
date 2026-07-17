@@ -93,12 +93,12 @@ A loop missing any of the three is a broken loop. Do not run it unattended.
 ## State contract
 
 Every iteration:
-1. Read `.agents/loop_state.md` registry (which sessions are active/completed).
-2. Read `.agents/loop_state/<session_id>.md` for the active session (where did I get to?).
+1. Read `.devin/loop_state.md` registry (which sessions are active/completed).
+2. Read `.devin/loop_state/<session_id>.md` for the active session (where did I get to?).
 3. Do one unit of work.
-4. Write `.agents/loop_state/<session_id>.md` and `.agents/session_state/<session_id>.json`
+4. Write `.devin/loop_state/<session_id>.md` and `.devin/session_state/<session_id>.json`
    (what did I do, what's next, what's still open).
-5. Call `python .devin/scripts/loop_memory_sync.py` to regenerate `.agents/loop_state.md` registry.
+5. Call `python .devin/scripts/loop_memory_sync.py` to regenerate `.devin/loop_state.md` registry.
 6. Check stop condition.
 7. Not met → next iteration. Met → stop, archive result.
 
@@ -125,10 +125,10 @@ When a checker finds a problem, the fix is a sub-task dispatched to a worker —
 
 > Source: oh-my-openagent's Todo Enforcer (Sisyphus Labs), reimplemented as prompt-level protocol (no OmO runtime dependency).
 
-If an agent has not produced output AND not written `.agents/loop_state/<session_id>.md` and `.agents/session_state/<session_id>.json` for **N** consecutive polling intervals (default N=2), the harness yanks it back:
+If an agent has not produced output AND not written `.devin/loop_state/<session_id>.md` and `.devin/session_state/<session_id>.json` for **N** consecutive polling intervals (default N=2), the harness yanks it back:
 
-1. **Re-inject the GoalSpec.** Re-read `.agents/loop_state/<session_id>.md`, restate the goal + current subtask.
-2. **Force a state write.** Require `.agents/loop_state/<session_id>.md` and `.agents/session_state/<session_id>.json` update before any other action.
+1. **Re-inject the GoalSpec.** Re-read `.devin/loop_state/<session_id>.md`, restate the goal + current subtask.
+2. **Force a state write.** Require `.devin/loop_state/<session_id>.md` and `.devin/session_state/<session_id>.json` update before any other action.
 3. **Diagnose the stall.** Blocked? confused? done-but-didn't-declare? Each has a different response.
 4. **Re-dispatch or escalate.** Don't let the agent sit idle again.
 
@@ -146,7 +146,7 @@ If an agent has not produced output AND not written `.agents/loop_state/<session
 
 Enforced by the **Commander** (or user, if no Commander). Between iterations, check each active worker: if `last_output_age > 2 * polling_interval` AND `state_write_age > 2 * polling_interval` → diagnose stall type → yank (re-inject GoalSpec + force state write + re-dispatch or escalate).
 
-For user-driven loops: if no per-session state write and no done-declaration → prompt: "You went idle. Read `.agents/loop_state/<session_id>.md`, state current subtask, continue. If blocked, say what. If done, run verification."
+For user-driven loops: if no per-session state write and no done-declaration → prompt: "You went idle. Read `.devin/loop_state/<session_id>.md`, state current subtask, continue. If blocked, say what. If done, run verification."
 
 ### Rules
 
@@ -154,7 +154,7 @@ For user-driven loops: if no per-session state write and no done-declaration →
 - **Don't yank too early.** N=2 gives agent time for real work. Every interval = micromanagement.
 - **Don't yank too late.** N>4 = loop stalled. User waiting.
 - **Yank ≠ escalate.** Yank = "wake up". Escalate = "human needed". Yank first; escalate if yank fails 2 rounds.
-- **State write is the heartbeat.** Writes `.agents/loop_state/<session_id>.md` and `.agents/session_state/<session_id>.json` = alive. Doesn't = idle or done — yank distinguishes.
+- **State write is the heartbeat.** Writes `.devin/loop_state/<session_id>.md` and `.devin/session_state/<session_id>.json` = alive. Doesn't = idle or done — yank distinguishes.
 
 See §"The 5+1 components" above for the component blueprint.
 
@@ -166,20 +166,20 @@ See §"The 5+1 components" above for the component blueprint.
 
 | # | Observable signal | Meaning | Action |
 |---|-------------------|---------|--------|
-| 1 | `.agents/loop_state/<session_id>.md` or `.agents/session_state/<session_id>.json` not updated 2+ iterations | Skipping per-session state writes — loop blind | Force per-session state write first. 2nd round → red line, escalate. |
+| 1 | `.devin/loop_state/<session_id>.md` or `.devin/session_state/<session_id>.json` not updated 2+ iterations | Skipping per-session state writes — loop blind | Force per-session state write first. 2nd round → red line, escalate. |
 | 2 | `verify.py` fails same check 2+ rounds | Systematic issue | Stop fixing symptoms. Dispatch systematic-debugging skill (Phase 1). |
 | 3 | `knowledge_distill.md` > 8KB | Knowledge bloated | Distillation pass: merge dups, abstract to patterns, archive to cold. |
 | 4 | Same error recurs across 2+ sessions | Anti-pattern not captured | Write `knowledge_distill.md` entry: trigger + action + counter-example. |
 | 5 | Budget cap hit, 0 convergence iterations | Not converging — goal wrong | Stop. Re-examine GoalSpec. Exit condition testable? Check deterministic? |
 | 6 | Worker BLOCKED 2+ times same task | Task too large or plan wrong | Break into smaller pieces or escalate. Don't retry same approach. |
 | 7 | 3+ fixes, each reveals new problem elsewhere | Architectural problem | Stop fixing. Question architecture. Discuss with human. (See Phase 4.5) |
-| 8 | `.agents/loop_state/<session_id>.md` exists but GoalSpec empty | BOOT incomplete | Stop. Re-run BOOT step 11. No work without GoalSpec for L/XL. |
+| 8 | `.devin/loop_state/<session_id>.md` exists but GoalSpec empty | BOOT incomplete | Stop. Re-run BOOT step 11. No work without GoalSpec for L/XL. |
 | 9 | Memory retrieval score < 0.35 all queries | Deep-memory irrelevant | Set `memory_low_relevance: true`. Don't fabricate. Fresh analysis. |
 | 10 | Knowledge entry references path grep returns nothing | Entry stale | Mark `[STALE: path not found — date]`. Re-verify or archive. |
 | 11 | 2+ tool-call parameter errors in session | Context degradation | Dispatch to fresh-context subagents. Don't retry same context. |
 | 12 | Model edits file marked "done" or contradicts `knowledge_distill.md` | Semantic drift | STOP. Re-read state + knowledge. Revert wrong edits. Confirm with human. |
 | 13 | Model claims "file written" but read-back shows missing/unchanged | False completion | Re-execute write. Verify read-back. 2nd fail → escalate. |
-| 14 | `.agents/context_flags/<session_id>.json.context_oversized = true` or `context_fill_pct > 70%` | Context degrading | Dispatch `context-compactor`. Offload large outputs. Lower `caveman_level`. |
+| 14 | `.devin/context_flags/<session_id>.json.context_oversized = true` or `context_fill_pct > 70%` | Context degrading | Dispatch `context-compactor`. Offload large outputs. Lower `caveman_level`. |
 | 15 | Loop actions don't map to GoalSpec (diff has unrelated changes) | Intent drift | STOP. Re-confirm intent with human. Start new loop if intent changed. |
 
 ### How to use the table
@@ -190,7 +190,7 @@ See §"The 5+1 components" above for the component blueprint.
 
 - **Observable, not interpretive.** "Agent seems confused" ≠ signal. "Agent's output contradicts GoalSpec §2" = signal.
 - **One signal → one action.** Don't bundle. If multiple fire: circuit breakers (7, 8) first, then state (1, 5), then knowledge (3, 4, 10), then memory (9).
-- **Log signal fires to `.agents/loop_state/<session_id>.md` and `.agents/session_state/<session_id>.json`.** Record: which signal, when, action taken.
+- **Log signal fires to `.devin/loop_state/<session_id>.md` and `.devin/session_state/<session_id>.json`.** Record: which signal, when, action taken.
 
 ## Loop Readiness Score
 
@@ -200,7 +200,7 @@ See §"The 5+1 components" above for the component blueprint.
 
 | Category | Max | What's checked | How to verify |
 |----------|-----|----------------|---------------|
-| **State persistence** | 20 | `.agents/loop_state.md` registry exists, <3KB; `.agents/loop_state/<session_id>.md` and `.agents/session_state/<session_id>.json` are written every iteration | `ls .agents/loop_state/<session_id>.md` + `ls .agents/session_state/<session_id>.json` + timestamps |
+| **State persistence** | 20 | `.devin/loop_state.md` registry exists, <3KB; `.devin/loop_state/<session_id>.md` and `.devin/session_state/<session_id>.json` are written every iteration | `ls .devin/loop_state/<session_id>.md` + `ls .devin/session_state/<session_id>.json` + timestamps |
 | **Knowledge layer** | 15 | `knowledge_distill.md` exists, <8KB, ≥1 distilled entry | `ls .agents/knowledge_distill.md` + `wc -c` |
 | **Stop conditions** | 15 | Every loop has budget + convergence + time limit | grep kickoffs for "Max iterations" + "Time limit" |
 | **Maker ≠ checker** | 15 | Fresh-context or CLI verification, not self-approval | Does verify.py exist? Separate verifier role? |
@@ -220,7 +220,7 @@ See §"The 5+1 components" above for the component blueprint.
 
 ### How to use
 
-1. **At harness setup:** Run rubric manually. Score each category. Fix gaps. 2. **After major changes:** Re-score. 3. **Before unattended loops:** Must score ≥90. <90 = unattended mistakes. 4. **Track over time:** Log to `.agents/loop_state/<session_id>.md` and `.agents/session_state/<session_id>.json`. Dropping score = harness decay.
+1. **At harness setup:** Run rubric manually. Score each category. Fix gaps. 2. **After major changes:** Re-score. 3. **Before unattended loops:** Must score ≥90. <90 = unattended mistakes. 4. **Track over time:** Log to `.devin/loop_state/<session_id>.md` and `.devin/session_state/<session_id>.json`. Dropping score = harness decay.
 
 ## Failure reverse-engineering (proactive weak-model defense)
 
@@ -238,7 +238,7 @@ See §"The 5+1 components" above for the component blueprint.
 | # | Failure mode | Root cause | Observable precursor | Defense | Signal |
 |---|-------------|------------|---------------------|---------|--------|
 | 1 | Tool-call degradation: wrong/stale params as context grows | Context bloat pushes tool schema out of attention | Tool call fails "invalid parameter" 2+ times | (a) Context >60% → subagent dispatch. (b) 2nd error → re-read schema. (c) Log `tool_call_degradation: true` | 11 |
-| 2 | Semantic drift: re-edits completed work | GoalSpec + completed-work scroll out of context | Edits file marked "done" or contradicts `knowledge_distill.md` | (a) Read `.agents/loop_state/<session_id>.md` every iteration. (b) Before editing: grep state+knowledge for filename. (c) Contradicts decision → STOP, re-read, confirm | 12 |
+| 2 | Semantic drift: re-edits completed work | GoalSpec + completed-work scroll out of context | Edits file marked "done" or contradicts `knowledge_distill.md` | (a) Read `.devin/loop_state/<session_id>.md` every iteration. (b) Before editing: grep state+knowledge for filename. (c) Contradicts decision → STOP, re-read, confirm | 12 |
 | 3 | False completion: claims "written" but file missing/unchanged | Completion narrative before tool call, or tool silently fails | Claims "written" but read-back shows missing/unchanged | (a) Every write → `read(path, limit=5)`. (b) `verify.py` at session end. (c) Read-back fails → re-write. (d) Log `false_completion_detected: true` | 13 |
 
 ### When to run failure reverse-engineering
@@ -300,7 +300,7 @@ For tools with hooks (Cursor `.cursor/hooks.json`, Claude `.claude/settings.json
 
 ### Standard loop body (applies to all)
 
-All loops follow the kickoff templates above. Steps: (1) check status/read state/run check command. (2) If problem found → read logs, fix, verify. (3) Re-check, write `.agents/loop_state/<session_id>.md` and `.agents/session_state/<session_id>.json`, then call `python .devin/scripts/loop_memory_sync.py` to update the registry; wait for cadence if `/loop`. State: §State contract. Maker/checker: CI/verifier checks; agent fixes. No self-approval.
+All loops follow the kickoff templates above. Steps: (1) check status/read state/run check command. (2) If problem found → read logs, fix, verify. (3) Re-check, write `.devin/loop_state/<session_id>.md` and `.devin/session_state/<session_id>.json`, then call `python .devin/scripts/loop_memory_sync.py` to update the registry; wait for cadence if `/loop`. State: §State contract. Maker/checker: CI/verifier checks; agent fixes. No self-approval.
 
 ### Loop-specific notes + variants
 
@@ -340,7 +340,7 @@ Auto-fixing something not broken (false positive). Pushing code that fails CI. D
 
 ### Logging the level
 
-Every kickoff must state: `Level: L1 (report-only) | L2 (assisted) | L3 (unattended)`. Log to `.agents/loop_state/<session_id>.md` and `.agents/session_state/<session_id>.json`. Track promotion/demotion history.
+Every kickoff must state: `Level: L1 (report-only) | L2 (assisted) | L3 (unattended)`. Log to `.devin/loop_state/<session_id>.md` and `.devin/session_state/<session_id>.json`. Track promotion/demotion history.
 
 ## Comprehension debt + Intent debt
 
@@ -369,13 +369,13 @@ Every kickoff must state: `Level: L1 (report-only) | L2 (assisted) | L3 (unatten
 |----------|-------------|------------|
 | **File race** | Two sessions edit same file | Worktree isolation per session (`.devin/scripts/worktree.py --session <session_id>`) |
 | **CI race** | Two sessions push same branch | One session per branch. Tag commits. |
-| **Duplicate work** | Two sessions fix same issue | Shared `.agents/loop_state.md` registry with `active_sessions[]` |
+| **Duplicate work** | Two sessions fix same issue | Shared `.devin/loop_state.md` registry with `active_sessions[]` |
 | **Resource contention** | Two sessions run expensive commands | Stagger cadences. |
 
 ### Coordination protocol
 
-1. **Register every session** before starting — `.devin/scripts/loop_memory_sync.py` writes the registry `.agents/loop_state.md` with `active_sessions: [{session_id, goal, status, tags, owned_files, last_heartbeat}]`.
-2. **Check before starting.** Read `.agents/loop_state.md` registry. If another `active_session` owns `owned_files`/`affected_files` overlapping the new task, ask the human whether to wait, continue, or serialize. **Never auto-resume.**
+1. **Register every session** before starting — `.devin/scripts/loop_memory_sync.py` writes the registry `.devin/loop_state.md` with `active_sessions: [{session_id, goal, status, tags, owned_files, last_heartbeat}]`.
+2. **Check before starting.** Read `.devin/loop_state.md` registry. If another `active_session` owns `owned_files`/`affected_files` overlapping the new task, ask the human whether to wait, continue, or serialize. **Never auto-resume.**
 3. **Worktree isolation.** Each session's parallel workers run in their own worktree (`.devin/scripts/worktree.py create --session <session_id> <worker_id>`). No session edits the main checkout directly.
 4. **Deregister on exit.** When a session completes or crashes, `.devin/scripts/loop_memory_sync.py` updates the registry and archives the per-session file to `.devin/loop_state_archive/<session_id>.md`.
 5. **Max 3 concurrent sessions.** More = resource contention + comprehension debt risk. Stagger cadences if needed.
@@ -527,8 +527,8 @@ Per triggered task:
   Step 3 — Adversarial review agent (fresh context, ≠ fix): attack the fix.
     Try to break it. Find edge cases. Check it doesn't solve X by breaking Y.
     Pass → close task. Fail → back to Step 2 (count toward retry cap).
-  Step 4 — Write outcome to .agents/loop_state/<session_id>.md and
-    .agents/session_state/<session_id>.json, then call
+  Step 4 — Write outcome to .devin/loop_state/<session_id>.md and
+    .devin/session_state/<session_id>.json, then call
     python .devin/scripts/loop_memory_sync.py to update the registry.
 
 Exit per task: adversarial review passes OR retry cap hit (escalate).
@@ -590,7 +590,7 @@ Can't answer → cognitive surrender (§"Cognitive surrender"). You're building 
 
 ### The defense: background sweep loop
 
-A dedicated `/loop` that periodically: (1) scans for pattern drift, (2) updates quality scores, (3) opens refactor PRs. Cadence: [e.g. every 24 hours]. Max iterations: [1 per run]. Time limit: [30 min per run]. Steps: scan repo for anti-patterns → score each module (clean/drift/degraded) → drift: open refactor PR (L2), degraded: flag in `knowledge_distill.md` + escalate → write sweep results to `.agents/loop_state/<session_id>.md` and `.agents/session_state/<session_id>.json`, then call `python .devin/scripts/loop_memory_sync.py` to update the registry. Exit when: sweep complete. State: §State contract (with sweep results).
+A dedicated `/loop` that periodically: (1) scans for pattern drift, (2) updates quality scores, (3) opens refactor PRs. Cadence: [e.g. every 24 hours]. Max iterations: [1 per run]. Time limit: [30 min per run]. Steps: scan repo for anti-patterns → score each module (clean/drift/degraded) → drift: open refactor PR (L2), degraded: flag in `knowledge_distill.md` + escalate → write sweep results to `.devin/loop_state/<session_id>.md` and `.devin/session_state/<session_id>.json`, then call `python .devin/scripts/loop_memory_sync.py` to update the registry. Exit when: sweep complete. State: §State contract (with sweep results).
 
 ### Entropy accumulation chain
 

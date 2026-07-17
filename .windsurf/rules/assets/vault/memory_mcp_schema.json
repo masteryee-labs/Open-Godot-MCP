@@ -20,7 +20,7 @@
   "three_layers": [
     {
       "layer": "hot",
-      "file": ".agents/loop_state.md",
+      "file": ".windsurf/loop_state.md",
       "cap": "3KB",
       "boot": "required (read at BOOT)",
       "purpose": "Current state, active GoalSpec, subtask progress, current iteration",

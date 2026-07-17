@@ -74,7 +74,7 @@ WARN_PATTERNS = [
 def _check_context_oversized_gate(data: dict) -> None:
     """Gate 1: context-oversized graduated enforcement.
 
-    Checks .agents/context_flags/<session_id>.json for context_oversized flag.
+    Checks .hermes/context_flags/<session_id>.json for context_oversized flag.
     If set, responds based on how many tool calls have passed without compaction:
       - counter < WARN_THRESHOLD: allow + stderr note
       - WARN_THRESHOLD <= counter < BLOCK_THRESHOLD: allow + stderr warning
@@ -114,7 +114,7 @@ def _check_context_oversized_gate(data: dict) -> None:
                 f"(1) offload large outputs to .hermes/tmp/, keep head+tail+path. "
                 f"(2) lower caveman_level to compact or ultra. "
                 f"(3) clear context_oversized flag in "
-                f".agents/context_flags/{session_id}.json. "
+                f".hermes/context_flags/{session_id}.json. "
                 f"Then retry this tool call.",
                 file=sys.stderr,
             )

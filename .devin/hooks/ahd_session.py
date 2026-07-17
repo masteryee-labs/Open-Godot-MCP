@@ -95,7 +95,7 @@ def get_session_id(data: Optional[Dict[str, Any]] = None, env_prefix: str = "AHD
 
     1. tool input `data["session_id"]`
     2. env var `{env_prefix}_SESSION_ID`
-    3. file `.agents/session_state/current_session`
+    3. file `.devin/session_state/current_session`
     4. UUID
     """
     data = data or {}
