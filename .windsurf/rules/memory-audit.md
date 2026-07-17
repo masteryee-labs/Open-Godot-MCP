@@ -10,7 +10,7 @@ description: "Use every 5 iterations, when scope changes, or before session end.
 ## Trigger
 - 5 iterations have passed.
 - Scope has changed significantly (new files, new goal, new tool).
-- Before writing the final `.windsurf/handoff_letter.md`.
+- Before writing the final `.agents/handoff_letter.md`.
 - `post_tool_use.py` has written candidate memory entries to the per-session file.
 
 ## When to run
@@ -20,22 +20,22 @@ At scope change, at iteration 5, and before the session ends.
 
 1. Call `python .windsurf/scripts/memory_audit.py --session <session_id>`.
 2. The script does the following:
-   - Read `.windsurf/session_state/<session_id>/candidate_memory.jsonl`.
+   - Read `.agents/session_state/<session_id>/candidate_memory.jsonl`.
    - For each candidate, check:
      - Does it have a clear trigger? (e.g., "file path with spaces in exec causes shell parse error")
      - Does it have a correct action? (e.g., "quote the path with double quotes")
      - Does it have a counter-example or a previous failure? (e.g., `exec command: rm /path with spaces`)
-   - If all three exist, merge into `.windsurf/knowledge_distill.md` in the format:
+   - If all three exist, merge into `.agents/knowledge_distill.md` in the format:
      ```
      - [memory] <trigger> -> <correct action> (counter: <...>)
      ```
    - If incomplete, either add the missing piece by reading the relevant journal or discard if it is too specific to a one-off event.
-   - If `.windsurf/knowledge_distill.md` exceeds 8KB, run a distillation pass:
+   - If `.agents/knowledge_distill.md` exceeds 8KB, run a distillation pass:
      - merge duplicates
      - abstract concrete paths into patterns
      - archive evicted entries to `.windsurf/loop_state_archive.md`
-   - Clear the processed candidates from `.windsurf/session_state/<session_id>/candidate_memory.jsonl`.
-3. You may also read the audit output from the script and append any high-level judgment to `.windsurf/handoff_letter.md`.
+   - Clear the processed candidates from `.agents/session_state/<session_id>/candidate_memory.jsonl`.
+3. You may also read the audit output from the script and append any high-level judgment to `.agents/handoff_letter.md`.
 
 ## Output
 ```

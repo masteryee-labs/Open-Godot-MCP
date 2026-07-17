@@ -73,7 +73,13 @@
     If not, set `deep_memory_offline: true`. Do not fabricate memory.
 14. **Large-repo init** (optional) — if the repo has >50 source files or >20 directories,
     consider running `init_deep` skill to build a code graph.
-15. **Differential gap-scan** — scan 1-2 scope angles only. See `.agents/skills/gap-scan.md`.
+15. **Task keyword lookup** — if `.agents/context_quick_lookup.md` exists (<3KB), read it.
+    It maps task keywords → required docs (O(1) lookup). Use it to decide which Docs to read.
+    If it does not exist, skip this step.
+16. **Project rules check** — if `user_profile.md` has `project_rules_dir` set, note the path.
+    If `project_rules_index` is set, read the index (<3KB) to know which project rules exist.
+    Load individual rule files on demand only — do NOT read all rules at BOOT.
+17. **Differential gap-scan** — scan 1-2 scope angles only. See `.agents/skills/gap-scan.md`.
 
 ## Rules
 

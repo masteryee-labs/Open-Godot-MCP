@@ -53,6 +53,20 @@ You are operating inside a **Agent Harness Deploy-distilled harness**:
 
 When canon is being *installed* (not used): `python scripts/distill.py`. Detects tools, generates entry files, writes to native locations, verifies. See `Docs/02-Deployment-Guide.md`.
 
+## 4b. Project-specific rules layer
+
+Canon is universal (same across all projects). But real projects have detailed rules that don't fit in `user_profile.md` (<2KB). The **project rules layer** fills this gap:
+
+| Layer | Location | Owner | Example |
+|-------|----------|-------|---------|
+| Canon (universal) | `.agents/canon/` | AHD deploys, project doesn't edit | BOOT_PROTOCOL, REDLINES |
+| Project rules | `.agents/rules/` | Project owns, AHD doesn't touch | Game rendering rules, API conventions |
+| Project profile | `.agents/user_profile.md` | Project owns | Red line summaries, never-read list, `project_rules_dir` pointer |
+
+- `distill.py` **never overwrites** `.agents/rules/`. It is project-owned.
+- `user_profile.md` has a `project_rules_dir` field (default: `.agents/rules/`) and optional `project_rules_index` field pointing to an index file.
+- Canon's BOOT_PROTOCOL reads `user_profile.md` → if `project_rules_dir` is set, load the index on demand.
+
 ## 5. Canon file map
 
 | File | Content |
@@ -160,7 +174,13 @@ Interview-mode: **mandatory XL**, **recommended L**, **optional M**, **skipped S
     If not, set `deep_memory_offline: true`. Do not fabricate memory.
 14. **Large-repo init** (optional) — if the repo has >50 source files or >20 directories,
     consider running `init_deep` skill to build a code graph.
-15. **Differential gap-scan** — scan 1-2 scope angles only. See `.agents/skills/gap-scan.md`.
+15. **Task keyword lookup** — if `.agents/context_quick_lookup.md` exists (<3KB), read it.
+    It maps task keywords → required docs (O(1) lookup). Use it to decide which Docs to read.
+    If it does not exist, skip this step.
+16. **Project rules check** — if `user_profile.md` has `project_rules_dir` set, note the path.
+    If `project_rules_index` is set, read the index (<3KB) to know which project rules exist.
+    Load individual rule files on demand only — do NOT read all rules at BOOT.
+17. **Differential gap-scan** — scan 1-2 scope angles only. See `.agents/skills/gap-scan.md`.
 
 ## Rules
 

@@ -20,7 +20,7 @@
   "three_layers": [
     {
       "layer": "hot",
-      "file": ".hermes/loop_state.md",
+      "file": ".agents/loop_state.md",
       "cap": "3KB",
       "boot": "required (read at BOOT)",
       "purpose": "Current state, active GoalSpec, subtask progress, current iteration",
@@ -47,7 +47,7 @@
     },
     {
       "layer": "knowledge",
-      "file": ".hermes/knowledge_distill.md",
+      "file": ".agents/knowledge_distill.md",
       "cap": "8KB",
       "boot": "required (read at BOOT, grep for task-relevant anti-patterns)",
       "purpose": "Distilled anti-patterns, reusable lessons, failure modes",

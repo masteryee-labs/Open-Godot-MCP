@@ -20,8 +20,8 @@ services: ["chroma-hybrid-search"]
 - Call `python .codex/scripts/memory_audit.py --session <session_id>` to merge per-session candidate memory.
 - Extract 1-3 core takeaways from a completed task.
 - Each takeaway: trigger situation + correct action + counter-example.
-- Write JSONL to cold-notes (or `.codex/knowledge_distill.md` if deep-memory offline).
-- Write project spirit / one-shot judgment to `.codex/handoff_letter.md` (not `.codex/canon/HANDOFF_LETTER.md`).
+- Write JSONL to cold-notes (or `.agents/knowledge_distill.md` if deep-memory offline).
+- Write project spirit / one-shot judgment to `.agents/handoff_letter.md` (not `.codex/canon/HANDOFF_LETTER.md`).
 - Judge whether something is worth storing — most one-off details are NOT.
 
 ## Out of scope

@@ -43,6 +43,20 @@ You are operating inside a **Agent Harness Deploy-distilled harness**:
 
 When canon is being *installed* (not used): `python scripts/distill.py`. Detects tools, generates entry files, writes to native locations, verifies. See `Docs/02-Deployment-Guide.md`.
 
+## 4b. Project-specific rules layer
+
+Canon is universal (same across all projects). But real projects have detailed rules that don't fit in `user_profile.md` (<2KB). The **project rules layer** fills this gap:
+
+| Layer | Location | Owner | Example |
+|-------|----------|-------|---------|
+| Canon (universal) | `.agents/canon/` | AHD deploys, project doesn't edit | BOOT_PROTOCOL, REDLINES |
+| Project rules | `.agents/rules/` | Project owns, AHD doesn't touch | Game rendering rules, API conventions |
+| Project profile | `.agents/user_profile.md` | Project owns | Red line summaries, never-read list, `project_rules_dir` pointer |
+
+- `distill.py` **never overwrites** `.agents/rules/`. It is project-owned.
+- `user_profile.md` has a `project_rules_dir` field (default: `.agents/rules/`) and optional `project_rules_index` field pointing to an index file.
+- Canon's BOOT_PROTOCOL reads `user_profile.md` → if `project_rules_dir` is set, load the index on demand.
+
 ## 5. Canon file map
 
 | File | Content |

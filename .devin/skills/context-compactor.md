@@ -8,7 +8,7 @@ description: "Use when context fill is >70%, a single tool output exceeds 20 lin
 > Prevent context-dumb zone. Compress long outputs without losing the signal.
 
 ## Trigger
-- `context_fill_pct > 70%` in `.devin/session_state/<session_id>.json` or `.devin/loop_state/<session_id>.md`.
+- `context_fill_pct > 70%` in `.agents/session_state/<session_id>.json` or `.agents/loop_state/<session_id>.md`.
 - A single `read`/`exec`/`Bash` output is > 20 lines or > 3KB.
 - Before reading any file known to be large (> 500 lines, build logs, lockfiles, traces).
 - You are about to paste a full file, stack trace, or test log into the chat.
@@ -20,7 +20,7 @@ At the start of every iteration if context is high, and immediately after a larg
 
 ## How
 
-1. Read `.devin/context_flags/<session_id>.json` if it exists. It contains `context_oversized` and any per-session signal.
+1. Read `.agents/context_flags/<session_id>.json` if it exists. It contains `context_oversized` and any per-session signal.
 2. For **read** calls:
    - Use `read` with `offset`/`limit` or `grep` to fetch only the relevant section.
    - If the full file is needed for later, use `grep` to extract relevant lines and write them to `.devin/tmp/<file-name>.summary.md`.
@@ -40,10 +40,10 @@ At the start of every iteration if context is high, and immediately after a larg
    - line numbers
    - error messages / exceptions
    - exact command outputs the next step depends on
-5. Update `.devin/loop_state/<session_id>.md` and `.devin/session_state/<session_id>.json`:
+5. Update `.agents/loop_state/<session_id>.md` and `.agents/session_state/<session_id>.json`:
    - `context_fill_pct` (estimate)
    - `caveman_level` (compact / ultra as needed)
-6. After compacting, clear `.devin/context_flags/<session_id>.json`:
+6. After compacting, clear `.agents/context_flags/<session_id>.json`:
    - Set `context_oversized: false`
    - Reset `oversized_tool_calls_since_flag: 0`
    This unblocks the `pre_tool_use.py` gate. Without clearing, non-compaction tools will remain blocked.

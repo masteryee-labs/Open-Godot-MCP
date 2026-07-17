@@ -21,7 +21,7 @@ You are operating inside a **Agent Harness Deploy-distilled harness**:
 - **Commander + workers**: main thread decides, dispatches, integrates. Workers scan/edit. See `.codex/agents/COMMANDER.md`.
 - **Parallel dispatch**: `.codex/scripts/plan_dispatch.py` (file ownership) + `.codex/scripts/worktree.py` (git worktree isolation). See `Docs/Agents/nuwa.md`.
 - **Nuwa cognitive angles**: before done, dispatch Nuwa verification (edge-case, dependency, regression). Vendored at `.codex/skills/nuwa-skill/` (from alchaincyf/nuwa-skill, MIT). Three pre-distilled perspectives (Munger/Feynman/Taleb).
-- **Memory persists**: state on disk (`.codex/loop_state.md` registry, `.codex/loop_state/<session_id>.md` per-session state, `.codex/session_state/<session_id>.json` machine state, and `.codex/knowledge_distill.md`), not context. See `MEMORY_PROTOCOL.md`.
+- **Memory persists**: state on disk (`.agents/loop_state.md` registry, `.agents/loop_state/<session_id>.md` per-session state, `.agents/session_state/<session_id>.json` machine state, and `.agents/knowledge_distill.md`), not context. See `MEMORY_PROTOCOL.md`.
 - **Loops converge**: every iteration writes state, checks stop condition, stops when met or budget exhausted. See `LOOP_PROTOCOL.md`.
 - **Maker ≠ checker**: producer never verifies. Fresh context or CLI verifies. See `VERIFICATION_PROTOCOL.md`.
 
@@ -52,6 +52,20 @@ You are operating inside a **Agent Harness Deploy-distilled harness**:
 ## 4. Deploy contract
 
 When canon is being *installed* (not used): `python scripts/distill.py`. Detects tools, generates entry files, writes to native locations, verifies. See `Docs/02-Deployment-Guide.md`.
+
+## 4b. Project-specific rules layer
+
+Canon is universal (same across all projects). But real projects have detailed rules that don't fit in `user_profile.md` (<2KB). The **project rules layer** fills this gap:
+
+| Layer | Location | Owner | Example |
+|-------|----------|-------|---------|
+| Canon (universal) | `.codex/canon/` | AHD deploys, project doesn't edit | BOOT_PROTOCOL, REDLINES |
+| Project rules | `.codex/rules/` | Project owns, AHD doesn't touch | Game rendering rules, API conventions |
+| Project profile | `.agents/user_profile.md` | Project owns | Red line summaries, never-read list, `project_rules_dir` pointer |
+
+- `distill.py` **never overwrites** `.codex/rules/`. It is project-owned.
+- `user_profile.md` has a `project_rules_dir` field (default: `.codex/rules/`) and optional `project_rules_index` field pointing to an index file.
+- Canon's BOOT_PROTOCOL reads `user_profile.md` → if `project_rules_dir` is set, load the index on demand.
 
 ## 5. Canon file map
 
@@ -95,7 +109,7 @@ Interview-mode: **mandatory XL**, **recommended L**, **optional M**, **skipped S
 
 1. **Read entry file** — the file that brought you here (AGENTS.md / CLAUDE.md /
    instructions.md / .devin/AGENTS.md). It routes you to canon.
-2. **Ensure registry exists** — `.codex/loop_state.md` is the session registry.
+2. **Ensure registry exists** — `.agents/loop_state.md` is the session registry.
    If it does not exist, create an empty registry with front matter:
    ```yaml
    ---
@@ -104,13 +118,13 @@ Interview-mode: **mandatory XL**, **recommended L**, **optional M**, **skipped S
    ---
    ```
    Do not write a `session_id` into the registry until the GoalSpec is finalized.
-3. **Read registry** — `.codex/loop_state.md` (<3KB). Inherit prior state:
+3. **Read registry** — `.agents/loop_state.md` (<3KB). Inherit prior state:
    `active_sessions`, `active_session`, and links to `knowledge_distill.md` and
    `handoff_letter.md`.
-4. **Read knowledge layer** — `.codex/knowledge_distill.md` (<8KB). Anti-patterns.
-5. **Read user profile** — `.codex/user_profile.md` (<2KB). Language, model tier,
+4. **Read knowledge layer** — `.agents/knowledge_distill.md` (<8KB). Anti-patterns.
+5. **Read user profile** — `.agents/user_profile.md` (<2KB). Language, model tier,
    project type, custom red lines.
-6. **Read handoff letter** — `.codex/handoff_letter.md` if it exists and `phase`
+6. **Read handoff letter** — `.agents/handoff_letter.md` if it exists and `phase`
    is `complete` or `last_update` is newer than the last known session.
 7. **Determine `session_id`** — choose or reuse a session ID:
    - Prefer a value supplied by the tool (`post_tool_use`/`stop` input or env var).
@@ -119,7 +133,7 @@ Interview-mode: **mandatory XL**, **recommended L**, **optional M**, **skipped S
      session ID is reused **only after** the human confirms continuation.
    - Otherwise generate a new `session_id` (slug/UUID, max 64 chars, no `: / \`
      or spaces).
-8. **Read per-session context flags** — `.codex/context_flags/<session_id>.json`
+8. **Read per-session context flags** — `.agents/context_flags/<session_id>.json`
    if it exists. Carries `context_oversized` and any per-session signal.
 9. **Pre-task / crash audit** — run `python .codex/scripts/pre_task_audit.py --files <files> --tags <tags> --session <session_id>`:
    - It reads `session_state/<session_id>.json` for any session in `active_sessions`
@@ -132,8 +146,8 @@ Interview-mode: **mandatory XL**, **recommended L**, **optional M**, **skipped S
      human whether to continue the previous session. **Never auto-resume.**
    - If no overlap, start a new session; the old session remains in the registry.
 10. **Read deploy guide** — `Docs/02-Deployment-Guide.md` (only if deploying).
-11. **Output GoalSpec** — write to `.codex/loop_state/<session_id>.md` and
-    `.codex/session_state/<session_id>.json`:
+11. **Output GoalSpec** — write to `.agents/loop_state/<session_id>.md` and
+    `.agents/session_state/<session_id>.json`:
     ```yaml
     session_id: "s-..."
     goal: "[one-line summary]"
@@ -152,7 +166,7 @@ Interview-mode: **mandatory XL**, **recommended L**, **optional M**, **skipped S
     The machine-readable JSON in `session_state` must include `status: in_progress`,
     `state_written: false`, `last_state_write`, `last_heartbeat`, `owned_files`,
     `affected_files`, and `tags`.
-12. **Update registry** — append the new session to `.codex/loop_state.md` active
+12. **Update registry** — append the new session to `.agents/loop_state.md` active
     sessions table and set `active_session` to the new `session_id`. Then call
     `python .codex/scripts/loop_memory_sync.py` to regenerate the registry from the
     session state files.
@@ -160,7 +174,13 @@ Interview-mode: **mandatory XL**, **recommended L**, **optional M**, **skipped S
     If not, set `deep_memory_offline: true`. Do not fabricate memory.
 14. **Large-repo init** (optional) — if the repo has >50 source files or >20 directories,
     consider running `init_deep` skill to build a code graph.
-15. **Differential gap-scan** — scan 1-2 scope angles only. See `.codex/skills/gap-scan.md`.
+15. **Task keyword lookup** — if `.agents/context_quick_lookup.md` exists (<3KB), read it.
+    It maps task keywords → required docs (O(1) lookup). Use it to decide which Docs to read.
+    If it does not exist, skip this step.
+16. **Project rules check** — if `user_profile.md` has `project_rules_dir` set, note the path.
+    If `project_rules_index` is set, read the index (<3KB) to know which project rules exist.
+    Load individual rule files on demand only — do NOT read all rules at BOOT.
+17. **Differential gap-scan** — scan 1-2 scope angles only. See `.codex/skills/gap-scan.md`.
 
 ## Rules
 
@@ -206,18 +226,18 @@ LLMs are stateless between runs. Every new session starts cold. If rules, lesson
 
 | Layer | File | Cap | BOOT | Purpose |
 |-------|------|-----|------|---------|
-| Hot Registry | `.codex/loop_state.md` | <3KB | required | Generated by `.codex/scripts/loop_memory_sync.py`. Active sessions + recent 3 completed. |
-| Hot Session (human) | `.codex/loop_state/<session_id>.md` | <8KB | required for current session | Per-session GoalSpec, subtasks, notes, last action. Written by the AI each iteration. |
-| Hot Session (machine) | `.codex/session_state/<session_id>.json` | <8KB | read only for audit/conflict | Machine-readable state: heartbeat, current subtask, owned/affected files, tags. Updated by hooks and `loop-memory`. |
-| Knowledge | `.codex/knowledge_distill.md` | <8KB | required | Anti-patterns, reusable lessons. Grows by distillation only. |
+| Hot Registry | `.agents/loop_state.md` | <3KB | required | Generated by `.codex/scripts/loop_memory_sync.py`. Active sessions + recent 3 completed. |
+| Hot Session (human) | `.agents/loop_state/<session_id>.md` | <8KB | required for current session | Per-session GoalSpec, subtasks, notes, last action. Written by the AI each iteration. |
+| Hot Session (machine) | `.agents/session_state/<session_id>.json` | <8KB | read only for audit/conflict | Machine-readable state: heartbeat, current subtask, owned/affected files, tags. Updated by hooks and `loop-memory`. |
+| Knowledge | `.agents/knowledge_distill.md` | <8KB | required | Anti-patterns, reusable lessons. Grows by distillation only. |
 | Cold | `.codex/loop_state_archive.md` + `.codex/loop_state_archive/<session_id>.md` | ∞ | grep only | Append-only event log + archived per-session markdown. Never read in full. |
 
 ## Write rules
 
 - **Every iteration ends by writing the per-session files.** Non-negotiable. Skipping = red line.
-  - Update `.codex/loop_state/<session_id>.md` with the GoalSpec, subtasks, last action, and notes.
-  - Update `.codex/session_state/<session_id>.json` with `current_subtask`, `last_action`, `last_state_write`, `state_written: true`, `context_fill_pct`, `caveman_level`, and `context_flags`.
-  - Then call `python .codex/scripts/loop_memory_sync.py` to regenerate `.codex/loop_state.md` registry.
+  - Update `.agents/loop_state/<session_id>.md` with the GoalSpec, subtasks, last action, and notes.
+  - Update `.agents/session_state/<session_id>.json` with `current_subtask`, `last_action`, `last_state_write`, `state_written: true`, `context_fill_pct`, `caveman_level`, and `context_flags`.
+  - Then call `python .codex/scripts/loop_memory_sync.py` to regenerate `.agents/loop_state.md` registry.
 - **Knowledge layer grows by distillation only.** Don't dump raw logs. Extract 1-3 takeaways,
   each with: trigger situation + correct action + counter-example.
 - **Cold layer is append-only.** Never edit; archive rotates hot→cold when hot exceeds cap.
@@ -271,8 +291,8 @@ python3 -m venv "$HOME/.deep-memory/.venv"
 | Different project | Cross-project; confirm applicability |
 
 ### Conflict rule
-Memory vs. current rules/files conflict → **current rules win**. Log conflict to `.codex/loop_state/<session_id>.md`.
-If the same conflict recurs, update `.codex/knowledge_distill.md` and consider correcting memory.
+Memory vs. current rules/files conflict → **current rules win**. Log conflict to `.agents/loop_state/<session_id>.md`.
+If the same conflict recurs, update `.agents/knowledge_distill.md` and consider correcting memory.
 
 ## The Memory Keeper worker
 
@@ -281,7 +301,7 @@ When a task reaches high completion, the Commander dispatches the **Memory Keepe
 
 1. Call `python .codex/scripts/memory_audit.py --session <session_id>` to merge candidate memory.
 2. Extract 1-3 reusable takeaways and write them to cold memory.
-3. Write project spirit / one-shot judgment to `.codex/handoff_letter.md` (not the canonical `.codex/canon/HANDOFF_LETTER.md`).
+3. Write project spirit / one-shot judgment to `.agents/handoff_letter.md` (not the canonical `.codex/canon/HANDOFF_LETTER.md`).
 4. Append a session-end marker to `.codex/loop_state_archive.md`.
 
 The Keeper judges whether something is worth storing — most one-off details are NOT.
@@ -292,7 +312,7 @@ Not every lesson waits for a high-completion task. Some patterns appear after a 
 
 ### Capture
 - `post_tool_use.py` observes every tool call. If the same tool/command fails with the same error 2+ times,
-  it writes a candidate entry to `.codex/session_state/<session_id>/candidate_memory.jsonl`:
+  it writes a candidate entry to `.agents/session_state/<session_id>/candidate_memory.jsonl`:
   ```json
   {"session_id": "s-...", "trigger": "...", "correct_action": "...", "counter": "...", "ts": "..."}
   ```
@@ -301,14 +321,14 @@ Not every lesson waits for a high-completion task. Some patterns appear after a 
 ### Distillation
 - Every 5 iterations, or at scope change, run `memory-audit` skill.
 - `memory-audit` invokes `python .codex/scripts/memory_audit.py --session <session_id>`.
-  It reads `.codex/session_state/<session_id>/candidate_memory.jsonl`, validates
-  `trigger + correct_action + counter`, merges valid entries into `.codex/knowledge_distill.md`,
+  It reads `.agents/session_state/<session_id>/candidate_memory.jsonl`, validates
+  `trigger + correct_action + counter`, merges valid entries into `.agents/knowledge_distill.md`,
   and clears the per-session candidate list.
 - Keep `candidate_memory.jsonl` small (< 50 entries per session). If it grows, run `memory-audit` early.
 
 ## Context flags
 
-`.codex/context_flags/<session_id>.json` is a per-session hot-path file that carries state across a single iteration:
+`.agents/context_flags/<session_id>.json` is a per-session hot-path file that carries state across a single iteration:
 ```json
 {
   "session_id": "s-...",
@@ -317,17 +337,17 @@ Not every lesson waits for a high-completion task. Some patterns appear after a 
   "oversized_first_detected": "2026-07-14T12:00:00Z"
 }
 ```
-- `post_tool_use.py` writes `context_oversized: true` + `oversized_tool_calls_since_flag: 0` to `.codex/context_flags/<session_id>.json` when a tool response is oversized. It also prints a stderr directive to the agent.
+- `post_tool_use.py` writes `context_oversized: true` + `oversized_tool_calls_since_flag: 0` to `.agents/context_flags/<session_id>.json` when a tool response is oversized. It also prints a stderr directive to the agent.
 - If the flag remains set, `post_tool_use.py` increments `oversized_tool_calls_since_flag` on each subsequent tool call.
 - `pre_tool_use.py` enforces a graduated gate: note (0-1) → warning (2-3) → block non-compaction tools (4+). Compaction-safe tools (read, grep, write, edit, etc.) are always allowed.
-- `context-compactor` reads `.codex/context_flags/<session_id>.json`, compacts, then clears `context_oversized: false` + resets counter to unblock the gate.
-- `loop-memory` reads `.codex/context_flags/<session_id>.json` at the end of each iteration,
-  copies `context_oversized` into `.codex/session_state/<session_id>.json`, and clears it.
+- `context-compactor` reads `.agents/context_flags/<session_id>.json`, compacts, then clears `context_oversized: false` + resets counter to unblock the gate.
+- `loop-memory` reads `.agents/context_flags/<session_id>.json` at the end of each iteration,
+  copies `context_oversized` into `.agents/session_state/<session_id>.json`, and clears it.
 
 ## `loop_state.md` registry schema
 
-`.codex/loop_state.md` is a generated registry, not a hand-written file. `.codex/scripts/loop_memory_sync.py`
-produces it from `.codex/session_state/*.json` and `.codex/loop_state/<session_id>.md` front matter.
+`.agents/loop_state.md` is a generated registry, not a hand-written file. `.codex/scripts/loop_memory_sync.py`
+produces it from `.agents/session_state/*.json` and `.agents/loop_state/<session_id>.md` front matter.
 It must include:
 ```markdown
 ---
@@ -354,8 +374,8 @@ if both are older than 30 minutes, an `in_progress` session is marked `suspected
 | ... | ... | completed | ... |
 
 ## Links
-- knowledge_distill: .codex/knowledge_distill.md
-- handoff_letter: .codex/handoff_letter.md
+- knowledge_distill: .agents/knowledge_distill.md
+- handoff_letter: .agents/handoff_letter.md
 - session_archive: .codex/loop_state_archive.md
 - session_archive_dir: .codex/loop_state_archive/
 ```
@@ -372,11 +392,11 @@ if both are older than 30 minutes, an `in_progress` session is marked `suspected
 
 ## `loop-memory` responsibilities
 
-1. At the start of each iteration, set `.codex/session_state/<session_id>.json` `state_written` to `false`.
+1. At the start of each iteration, set `.agents/session_state/<session_id>.json` `state_written` to `false`.
 2. At the end of each iteration:
-   - Update `.codex/loop_state/<session_id>.md` (GoalSpec, subtasks, last action, notes, caveman level).
-   - Update `.codex/session_state/<session_id>.json` (current subtask, last action, `last_state_write`, `state_written: true`, `context_fill_pct`, `caveman_level`, `context_flags`, `owned_files`, `affected_files`, `tags`).
-   - Call `python .codex/scripts/loop_memory_sync.py` to regenerate `.codex/loop_state.md`.
+   - Update `.agents/loop_state/<session_id>.md` (GoalSpec, subtasks, last action, notes, caveman level).
+   - Update `.agents/session_state/<session_id>.json` (current subtask, last action, `last_state_write`, `state_written: true`, `context_fill_pct`, `caveman_level`, `context_flags`, `owned_files`, `affected_files`, `tags`).
+   - Call `python .codex/scripts/loop_memory_sync.py` to regenerate `.agents/loop_state.md`.
 3. Never let the per-session hot file exceed 8KB. Rotate to archive, don't truncate.
 
 ## Anti-patterns (do not)
@@ -414,7 +434,7 @@ When an expiration trigger fires:
 2. **Re-verify.** Check the entry against current files/state. Does it still hold?
 3. **Re-derive or archive.** If still valid → remove `[STALE]` tag, note re-verification date.
    If invalid → archive to cold layer with `[EXPIRED: reason — date]`, write new entry if needed.
-4. **Log to `.codex/loop_state/<session_id>.md`.** Record what expired and what was re-derived.
+4. **Log to `.agents/loop_state/<session_id>.md`.** Record what expired and what was re-derived.
 
 ### The three re-review questions
 
@@ -466,7 +486,7 @@ noticing.
 #### 1. Compaction — smart compression and offloading
 
 When context approaches the degradation threshold, **compress and offload:**
-- Summarize completed work into a compact per-session state file (`.codex/loop_state/<session_id>.md`).
+- Summarize completed work into a compact per-session state file (`.agents/loop_state/<session_id>.md`).
 - Offload large tool outputs to the filesystem; keep only head + tail in context.
 - Drop completed subtask details; keep only open items + decisions.
 
@@ -603,12 +623,12 @@ A loop missing any of the three is a broken loop. Do not run it unattended.
 ## State contract
 
 Every iteration:
-1. Read `.codex/loop_state.md` registry (which sessions are active/completed).
-2. Read `.codex/loop_state/<session_id>.md` for the active session (where did I get to?).
+1. Read `.agents/loop_state.md` registry (which sessions are active/completed).
+2. Read `.agents/loop_state/<session_id>.md` for the active session (where did I get to?).
 3. Do one unit of work.
-4. Write `.codex/loop_state/<session_id>.md` and `.codex/session_state/<session_id>.json`
+4. Write `.agents/loop_state/<session_id>.md` and `.agents/session_state/<session_id>.json`
    (what did I do, what's next, what's still open).
-5. Call `python .codex/scripts/loop_memory_sync.py` to regenerate `.codex/loop_state.md` registry.
+5. Call `python .codex/scripts/loop_memory_sync.py` to regenerate `.agents/loop_state.md` registry.
 6. Check stop condition.
 7. Not met → next iteration. Met → stop, archive result.
 
@@ -635,10 +655,10 @@ When a checker finds a problem, the fix is a sub-task dispatched to a worker —
 
 > Source: oh-my-openagent's Todo Enforcer (Sisyphus Labs), reimplemented as prompt-level protocol (no OmO runtime dependency).
 
-If an agent has not produced output AND not written `.codex/loop_state/<session_id>.md` and `.codex/session_state/<session_id>.json` for **N** consecutive polling intervals (default N=2), the harness yanks it back:
+If an agent has not produced output AND not written `.agents/loop_state/<session_id>.md` and `.agents/session_state/<session_id>.json` for **N** consecutive polling intervals (default N=2), the harness yanks it back:
 
-1. **Re-inject the GoalSpec.** Re-read `.codex/loop_state/<session_id>.md`, restate the goal + current subtask.
-2. **Force a state write.** Require `.codex/loop_state/<session_id>.md` and `.codex/session_state/<session_id>.json` update before any other action.
+1. **Re-inject the GoalSpec.** Re-read `.agents/loop_state/<session_id>.md`, restate the goal + current subtask.
+2. **Force a state write.** Require `.agents/loop_state/<session_id>.md` and `.agents/session_state/<session_id>.json` update before any other action.
 3. **Diagnose the stall.** Blocked? confused? done-but-didn't-declare? Each has a different response.
 4. **Re-dispatch or escalate.** Don't let the agent sit idle again.
 
@@ -656,7 +676,7 @@ If an agent has not produced output AND not written `.codex/loop_state/<session_
 
 Enforced by the **Commander** (or user, if no Commander). Between iterations, check each active worker: if `last_output_age > 2 * polling_interval` AND `state_write_age > 2 * polling_interval` → diagnose stall type → yank (re-inject GoalSpec + force state write + re-dispatch or escalate).
 
-For user-driven loops: if no per-session state write and no done-declaration → prompt: "You went idle. Read `.codex/loop_state/<session_id>.md`, state current subtask, continue. If blocked, say what. If done, run verification."
+For user-driven loops: if no per-session state write and no done-declaration → prompt: "You went idle. Read `.agents/loop_state/<session_id>.md`, state current subtask, continue. If blocked, say what. If done, run verification."
 
 ### Rules
 
@@ -664,7 +684,7 @@ For user-driven loops: if no per-session state write and no done-declaration →
 - **Don't yank too early.** N=2 gives agent time for real work. Every interval = micromanagement.
 - **Don't yank too late.** N>4 = loop stalled. User waiting.
 - **Yank ≠ escalate.** Yank = "wake up". Escalate = "human needed". Yank first; escalate if yank fails 2 rounds.
-- **State write is the heartbeat.** Writes `.codex/loop_state/<session_id>.md` and `.codex/session_state/<session_id>.json` = alive. Doesn't = idle or done — yank distinguishes.
+- **State write is the heartbeat.** Writes `.agents/loop_state/<session_id>.md` and `.agents/session_state/<session_id>.json` = alive. Doesn't = idle or done — yank distinguishes.
 
 See §"The 5+1 components" above for the component blueprint.
 
@@ -676,20 +696,20 @@ See §"The 5+1 components" above for the component blueprint.
 
 | # | Observable signal | Meaning | Action |
 |---|-------------------|---------|--------|
-| 1 | `.codex/loop_state/<session_id>.md` or `.codex/session_state/<session_id>.json` not updated 2+ iterations | Skipping per-session state writes — loop blind | Force per-session state write first. 2nd round → red line, escalate. |
+| 1 | `.agents/loop_state/<session_id>.md` or `.agents/session_state/<session_id>.json` not updated 2+ iterations | Skipping per-session state writes — loop blind | Force per-session state write first. 2nd round → red line, escalate. |
 | 2 | `verify.py` fails same check 2+ rounds | Systematic issue | Stop fixing symptoms. Dispatch systematic-debugging skill (Phase 1). |
 | 3 | `knowledge_distill.md` > 8KB | Knowledge bloated | Distillation pass: merge dups, abstract to patterns, archive to cold. |
 | 4 | Same error recurs across 2+ sessions | Anti-pattern not captured | Write `knowledge_distill.md` entry: trigger + action + counter-example. |
 | 5 | Budget cap hit, 0 convergence iterations | Not converging — goal wrong | Stop. Re-examine GoalSpec. Exit condition testable? Check deterministic? |
 | 6 | Worker BLOCKED 2+ times same task | Task too large or plan wrong | Break into smaller pieces or escalate. Don't retry same approach. |
 | 7 | 3+ fixes, each reveals new problem elsewhere | Architectural problem | Stop fixing. Question architecture. Discuss with human. (See Phase 4.5) |
-| 8 | `.codex/loop_state/<session_id>.md` exists but GoalSpec empty | BOOT incomplete | Stop. Re-run BOOT step 11. No work without GoalSpec for L/XL. |
+| 8 | `.agents/loop_state/<session_id>.md` exists but GoalSpec empty | BOOT incomplete | Stop. Re-run BOOT step 11. No work without GoalSpec for L/XL. |
 | 9 | Memory retrieval score < 0.35 all queries | Deep-memory irrelevant | Set `memory_low_relevance: true`. Don't fabricate. Fresh analysis. |
 | 10 | Knowledge entry references path grep returns nothing | Entry stale | Mark `[STALE: path not found — date]`. Re-verify or archive. |
 | 11 | 2+ tool-call parameter errors in session | Context degradation | Dispatch to fresh-context subagents. Don't retry same context. |
 | 12 | Model edits file marked "done" or contradicts `knowledge_distill.md` | Semantic drift | STOP. Re-read state + knowledge. Revert wrong edits. Confirm with human. |
 | 13 | Model claims "file written" but read-back shows missing/unchanged | False completion | Re-execute write. Verify read-back. 2nd fail → escalate. |
-| 14 | `.codex/context_flags/<session_id>.json.context_oversized = true` or `context_fill_pct > 70%` | Context degrading | Dispatch `context-compactor`. Offload large outputs. Lower `caveman_level`. |
+| 14 | `.agents/context_flags/<session_id>.json.context_oversized = true` or `context_fill_pct > 70%` | Context degrading | Dispatch `context-compactor`. Offload large outputs. Lower `caveman_level`. |
 | 15 | Loop actions don't map to GoalSpec (diff has unrelated changes) | Intent drift | STOP. Re-confirm intent with human. Start new loop if intent changed. |
 
 ### How to use the table
@@ -700,7 +720,7 @@ See §"The 5+1 components" above for the component blueprint.
 
 - **Observable, not interpretive.** "Agent seems confused" ≠ signal. "Agent's output contradicts GoalSpec §2" = signal.
 - **One signal → one action.** Don't bundle. If multiple fire: circuit breakers (7, 8) first, then state (1, 5), then knowledge (3, 4, 10), then memory (9).
-- **Log signal fires to `.codex/loop_state/<session_id>.md` and `.codex/session_state/<session_id>.json`.** Record: which signal, when, action taken.
+- **Log signal fires to `.agents/loop_state/<session_id>.md` and `.agents/session_state/<session_id>.json`.** Record: which signal, when, action taken.
 
 ## Loop Readiness Score
 
@@ -710,8 +730,8 @@ See §"The 5+1 components" above for the component blueprint.
 
 | Category | Max | What's checked | How to verify |
 |----------|-----|----------------|---------------|
-| **State persistence** | 20 | `.codex/loop_state.md` registry exists, <3KB; `.codex/loop_state/<session_id>.md` and `.codex/session_state/<session_id>.json` are written every iteration | `ls .codex/loop_state/<session_id>.md` + `ls .codex/session_state/<session_id>.json` + timestamps |
-| **Knowledge layer** | 15 | `knowledge_distill.md` exists, <8KB, ≥1 distilled entry | `ls .codex/knowledge_distill.md` + `wc -c` |
+| **State persistence** | 20 | `.agents/loop_state.md` registry exists, <3KB; `.agents/loop_state/<session_id>.md` and `.agents/session_state/<session_id>.json` are written every iteration | `ls .agents/loop_state/<session_id>.md` + `ls .agents/session_state/<session_id>.json` + timestamps |
+| **Knowledge layer** | 15 | `knowledge_distill.md` exists, <8KB, ≥1 distilled entry | `ls .agents/knowledge_distill.md` + `wc -c` |
 | **Stop conditions** | 15 | Every loop has budget + convergence + time limit | grep kickoffs for "Max iterations" + "Time limit" |
 | **Maker ≠ checker** | 15 | Fresh-context or CLI verification, not self-approval | Does verify.py exist? Separate verifier role? |
 | **Memory safety** | 10 | No secrets in any layer; cold layer grep-only | `grep -r "key\|token\|password" .codex/` = nothing |
@@ -730,7 +750,7 @@ See §"The 5+1 components" above for the component blueprint.
 
 ### How to use
 
-1. **At harness setup:** Run rubric manually. Score each category. Fix gaps. 2. **After major changes:** Re-score. 3. **Before unattended loops:** Must score ≥90. <90 = unattended mistakes. 4. **Track over time:** Log to `.codex/loop_state/<session_id>.md` and `.codex/session_state/<session_id>.json`. Dropping score = harness decay.
+1. **At harness setup:** Run rubric manually. Score each category. Fix gaps. 2. **After major changes:** Re-score. 3. **Before unattended loops:** Must score ≥90. <90 = unattended mistakes. 4. **Track over time:** Log to `.agents/loop_state/<session_id>.md` and `.agents/session_state/<session_id>.json`. Dropping score = harness decay.
 
 ## Failure reverse-engineering (proactive weak-model defense)
 
@@ -748,7 +768,7 @@ See §"The 5+1 components" above for the component blueprint.
 | # | Failure mode | Root cause | Observable precursor | Defense | Signal |
 |---|-------------|------------|---------------------|---------|--------|
 | 1 | Tool-call degradation: wrong/stale params as context grows | Context bloat pushes tool schema out of attention | Tool call fails "invalid parameter" 2+ times | (a) Context >60% → subagent dispatch. (b) 2nd error → re-read schema. (c) Log `tool_call_degradation: true` | 11 |
-| 2 | Semantic drift: re-edits completed work | GoalSpec + completed-work scroll out of context | Edits file marked "done" or contradicts `knowledge_distill.md` | (a) Read `.codex/loop_state/<session_id>.md` every iteration. (b) Before editing: grep state+knowledge for filename. (c) Contradicts decision → STOP, re-read, confirm | 12 |
+| 2 | Semantic drift: re-edits completed work | GoalSpec + completed-work scroll out of context | Edits file marked "done" or contradicts `knowledge_distill.md` | (a) Read `.agents/loop_state/<session_id>.md` every iteration. (b) Before editing: grep state+knowledge for filename. (c) Contradicts decision → STOP, re-read, confirm | 12 |
 | 3 | False completion: claims "written" but file missing/unchanged | Completion narrative before tool call, or tool silently fails | Claims "written" but read-back shows missing/unchanged | (a) Every write → `read(path, limit=5)`. (b) `verify.py` at session end. (c) Read-back fails → re-write. (d) Log `false_completion_detected: true` | 13 |
 
 ### When to run failure reverse-engineering
@@ -810,7 +830,7 @@ For tools with hooks (Cursor `.cursor/hooks.json`, Claude `.claude/settings.json
 
 ### Standard loop body (applies to all)
 
-All loops follow the kickoff templates above. Steps: (1) check status/read state/run check command. (2) If problem found → read logs, fix, verify. (3) Re-check, write `.codex/loop_state/<session_id>.md` and `.codex/session_state/<session_id>.json`, then call `python .codex/scripts/loop_memory_sync.py` to update the registry; wait for cadence if `/loop`. State: §State contract. Maker/checker: CI/verifier checks; agent fixes. No self-approval.
+All loops follow the kickoff templates above. Steps: (1) check status/read state/run check command. (2) If problem found → read logs, fix, verify. (3) Re-check, write `.agents/loop_state/<session_id>.md` and `.agents/session_state/<session_id>.json`, then call `python .codex/scripts/loop_memory_sync.py` to update the registry; wait for cadence if `/loop`. State: §State contract. Maker/checker: CI/verifier checks; agent fixes. No self-approval.
 
 ### Loop-specific notes + variants
 
@@ -850,7 +870,7 @@ Auto-fixing something not broken (false positive). Pushing code that fails CI. D
 
 ### Logging the level
 
-Every kickoff must state: `Level: L1 (report-only) | L2 (assisted) | L3 (unattended)`. Log to `.codex/loop_state/<session_id>.md` and `.codex/session_state/<session_id>.json`. Track promotion/demotion history.
+Every kickoff must state: `Level: L1 (report-only) | L2 (assisted) | L3 (unattended)`. Log to `.agents/loop_state/<session_id>.md` and `.agents/session_state/<session_id>.json`. Track promotion/demotion history.
 
 ## Comprehension debt + Intent debt
 
@@ -879,13 +899,13 @@ Every kickoff must state: `Level: L1 (report-only) | L2 (assisted) | L3 (unatten
 |----------|-------------|------------|
 | **File race** | Two sessions edit same file | Worktree isolation per session (`.codex/scripts/worktree.py --session <session_id>`) |
 | **CI race** | Two sessions push same branch | One session per branch. Tag commits. |
-| **Duplicate work** | Two sessions fix same issue | Shared `.codex/loop_state.md` registry with `active_sessions[]` |
+| **Duplicate work** | Two sessions fix same issue | Shared `.agents/loop_state.md` registry with `active_sessions[]` |
 | **Resource contention** | Two sessions run expensive commands | Stagger cadences. |
 
 ### Coordination protocol
 
-1. **Register every session** before starting — `.codex/scripts/loop_memory_sync.py` writes the registry `.codex/loop_state.md` with `active_sessions: [{session_id, goal, status, tags, owned_files, last_heartbeat}]`.
-2. **Check before starting.** Read `.codex/loop_state.md` registry. If another `active_session` owns `owned_files`/`affected_files` overlapping the new task, ask the human whether to wait, continue, or serialize. **Never auto-resume.**
+1. **Register every session** before starting — `.codex/scripts/loop_memory_sync.py` writes the registry `.agents/loop_state.md` with `active_sessions: [{session_id, goal, status, tags, owned_files, last_heartbeat}]`.
+2. **Check before starting.** Read `.agents/loop_state.md` registry. If another `active_session` owns `owned_files`/`affected_files` overlapping the new task, ask the human whether to wait, continue, or serialize. **Never auto-resume.**
 3. **Worktree isolation.** Each session's parallel workers run in their own worktree (`.codex/scripts/worktree.py create --session <session_id> <worker_id>`). No session edits the main checkout directly.
 4. **Deregister on exit.** When a session completes or crashes, `.codex/scripts/loop_memory_sync.py` updates the registry and archives the per-session file to `.codex/loop_state_archive/<session_id>.md`.
 5. **Max 3 concurrent sessions.** More = resource contention + comprehension debt risk. Stagger cadences if needed.
@@ -1037,8 +1057,8 @@ Per triggered task:
   Step 3 — Adversarial review agent (fresh context, ≠ fix): attack the fix.
     Try to break it. Find edge cases. Check it doesn't solve X by breaking Y.
     Pass → close task. Fail → back to Step 2 (count toward retry cap).
-  Step 4 — Write outcome to .codex/loop_state/<session_id>.md and
-    .codex/session_state/<session_id>.json, then call
+  Step 4 — Write outcome to .agents/loop_state/<session_id>.md and
+    .agents/session_state/<session_id>.json, then call
     python .codex/scripts/loop_memory_sync.py to update the registry.
 
 Exit per task: adversarial review passes OR retry cap hit (escalate).
@@ -1100,7 +1120,7 @@ Can't answer → cognitive surrender (§"Cognitive surrender"). You're building 
 
 ### The defense: background sweep loop
 
-A dedicated `/loop` that periodically: (1) scans for pattern drift, (2) updates quality scores, (3) opens refactor PRs. Cadence: [e.g. every 24 hours]. Max iterations: [1 per run]. Time limit: [30 min per run]. Steps: scan repo for anti-patterns → score each module (clean/drift/degraded) → drift: open refactor PR (L2), degraded: flag in `knowledge_distill.md` + escalate → write sweep results to `.codex/loop_state/<session_id>.md` and `.codex/session_state/<session_id>.json`, then call `python .codex/scripts/loop_memory_sync.py` to update the registry. Exit when: sweep complete. State: §State contract (with sweep results).
+A dedicated `/loop` that periodically: (1) scans for pattern drift, (2) updates quality scores, (3) opens refactor PRs. Cadence: [e.g. every 24 hours]. Max iterations: [1 per run]. Time limit: [30 min per run]. Steps: scan repo for anti-patterns → score each module (clean/drift/degraded) → drift: open refactor PR (L2), degraded: flag in `knowledge_distill.md` + escalate → write sweep results to `.agents/loop_state/<session_id>.md` and `.agents/session_state/<session_id>.json`, then call `python .codex/scripts/loop_memory_sync.py` to update the registry. Exit when: sweep complete. State: §State contract (with sweep results).
 
 ### Entropy accumulation chain
 
@@ -1748,7 +1768,7 @@ Context fill is a leading indicator of token waste. When the window fills, the m
 - A single `read` would exceed 50 lines → use `read` with `offset`/`limit` or `grep`.
 
 ### Automatic load + enforcement
-- `post_tool_use.py` writes `context_oversized: true` + `oversized_tool_calls_since_flag: 0` to `.codex/context_flags/<session_id>.json` when a tool response is oversized. It also prints a stderr directive telling the agent to run `context-compactor` — most tools feed hook stderr back to the agent as feedback.
+- `post_tool_use.py` writes `context_oversized: true` + `oversized_tool_calls_since_flag: 0` to `.agents/context_flags/<session_id>.json` when a tool response is oversized. It also prints a stderr directive telling the agent to run `context-compactor` — most tools feed hook stderr back to the agent as feedback.
 - If the flag is still set on the next tool call, `post_tool_use.py` increments `oversized_tool_calls_since_flag` — tracking how many tool calls have passed without compaction.
 - `pre_tool_use.py` enforces a **graduated gate** based on the counter:
   - **counter 0-1** (note): non-compaction tools allowed + stderr note "compact soon."
@@ -1756,14 +1776,14 @@ Context fill is a leading indicator of token waste. When the window fills, the m
   - **counter >= 4** (block): non-compaction tools **blocked** (exit 2). Agent must run `context-compactor` skill and clear the flag before continuing.
   - Compaction-safe tools (read, grep, glob, write, edit, notebook_*, todo_write, skill) are **always allowed** — the agent needs them to actually compact.
 - This makes compaction **enforced, not suggested**. The agent can't ignore the flag indefinitely — at 4+ un-compacted tool calls, it is forced to act.
-- `loop-memory` reads `.codex/context_flags/<session_id>.json` at the end of every iteration and updates `.codex/session_state/<session_id>.json` and `.codex/loop_state/<session_id>.md`.
-- `.codex/loop_state.md` registry front matter must include:
+- `loop-memory` reads `.agents/context_flags/<session_id>.json` at the end of every iteration and updates `.agents/session_state/<session_id>.json` and `.agents/loop_state/<session_id>.md`.
+- `.agents/loop_state.md` registry front matter must include:
   ```yaml
   context_fill_pct: <0-100 estimate>
   caveman_level: <light|compact|full|ultra|wenyan>
   active_session: s-...
   ```
-- `.codex/loop_state/<session_id>.md` must include:
+- `.agents/loop_state/<session_id>.md` must include:
   ```yaml
   context_fill_pct: <0-100>
   caveman_level: <light|compact|full|ultra|wenyan>
@@ -1900,7 +1920,7 @@ Can't write positive/negative examples? Criterion too vague → escalate to huma
 | **Question** | Is there an active, crashed, or suspected-crashed session whose `owned_files`/`affected_files`/`tags` overlap the new task? |
 | **Positive** | "Session `s-20260709-abc` is `suspected_crashed` on `current_subtask: add file lock to base.py`. New task is `fix sync.py concurrency` and `owned_files` lists `scripts/sync.py` and `adapters/base.py`." |
 | **Negative** | "No active sessions, or active session `s-xyz` owns `Docs/Agents/nuwa.md` while new task is `scripts/distill.py` with no file/tag overlap." |
-| **Action +** | STOP. Read `.codex/loop_state/<session_id>.md` and `.codex/session_state/<session_id>.json`. Ask the human: "Session `s-xxx` was interrupted at `<current_subtask>`. Continue it, or start new?" |
+| **Action +** | STOP. Read `.agents/loop_state/<session_id>.md` and `.agents/session_state/<session_id>.json`. Ask the human: "Session `s-xxx` was interrupted at `<current_subtask>`. Continue it, or start new?" |
 | **Action −** | Start a new session with a fresh `session_id`; keep the old session in `active_sessions` unless it is completed. |
 
 ## How to use
@@ -2353,9 +2373,9 @@ Attention distribution in long context:
 10. **No silent failure.** If a step fails, report the error verbatim and the path. Do not swallow exceptions and continue.
 11. **No modifying the deployer's own canon during a deploy.** A deploy installs canon into tools. It does not edit canon. Canon edits are a separate, human-approved action.
 12. **No auto-resume of a previous session.** If a session is `in_progress`, `crashed`, or `suspected_crashed`, detect it, read `session_state/<session_id>.json`, and ask the human before continuing. Never resume without explicit human approval.
-13. **No reading all `loop_state/*.md` files at BOOT.** Read `.codex/loop_state.md` registry first, then only the one `.codex/loop_state/<session_id>.md` that matches the current task. Mass-reading session files is a red line.
-14. **No secrets in tool log / session state / journal.** Never write keys, tokens, passwords, or API credentials into `.codex/session_state/`, `.codex/session_state/<session_id>/journal.jsonl`, or any tool log. Redact `command`/`counter` before logging.
-15. **No modifying `.codex/canon/HANDOFF_LETTER.md`.** Runtime judgment and project spirit go into `.codex/handoff_letter.md`. The canonical `HANDOFF_LETTER.md` is source-only and must not be edited by runtime scripts or sessions.
+13. **No reading all `loop_state/*.md` files at BOOT.** Read `.agents/loop_state.md` registry first, then only the one `.agents/loop_state/<session_id>.md` that matches the current task. Mass-reading session files is a red line.
+14. **No secrets in tool log / session state / journal.** Never write keys, tokens, passwords, or API credentials into `.agents/session_state/`, `.agents/session_state/<session_id>/journal.jsonl`, or any tool log. Redact `command`/`counter` before logging.
+15. **No modifying `.codex/canon/HANDOFF_LETTER.md`.** Runtime judgment and project spirit go into `.agents/handoff_letter.md`. The canonical `HANDOFF_LETTER.md` is source-only and must not be edited by runtime scripts or sessions.
 16. **No explanatory comments in generated code.** AI-generated code must not contain comments that restate what the code already says (`# loop through items`, `// increment counter`). Comments are debt, not documentation. The only permitted comments: (a) API contracts / public-interface docs, (b) non-obvious invariants the reader cannot derive from the code, (c) `TODO`/`FIXME` with an owner or issue ref, (d) language directives (`//go:generate`, `# type: ignore`). Restating-the-code comments = slop. Source: arXiv 2605.02741 (Volume-Quality Inverse Law — comment bloat predicts structural decay); arXiv 2512.20334 (Comment Traps — commented-out/defective comments propagate defects at up to 58%). When the user asks for teaching mode, this red line relaxes for that session only.
 17. **No in-file version stacking.** Do not accumulate version markers, changelog blocks, or `<!-- updated YYYY-MM-DD -->` / `# v2 fixed X` / `# v3` lines inside source files. Version truth = git history + a single append-only `CHANGELOG.md` (one entry per release, not per edit). In-file stacking is context rot (arXiv 2606.09090) and recursive-depth debt. `scripts/sync.py --canon` rejects canon files with stacked version markers in the header. If you must record a change, write one line to `CHANGELOG.md` or rely on the git commit. Never edit a version marker inside the file body.
 

@@ -15,3 +15,19 @@
 > - `mid` is the default for Builder, Verifier, Memory Keeper.
 > - `high` is for Auditor, multi-step reasoning, and L/XL final checks.
 > - If a tier is not available, default to the next higher tier.
+
+## Escalation rules
+
+When a model fails, escalate — don't retry the same tier indefinitely.
+
+| Current tier | Failure signal | Action |
+|--------------|---------------|--------|
+| cheap | Same subtask fails **1 time** (syntax error, path error, wrong API) | Escalate to mid with failure trace |
+| mid | Same subtask fails **2 times** consecutively | Escalate to high with failure trace |
+| high | Same subtask fails **2 times** consecutively | Stop. Mark `human_required`. Ask the human. |
+
+**Failure trace** (required when escalating): error message + attempted fix + file:line + command output.
+
+**Max retries**: 2 rounds total per issue (including tier changes). After 2 rounds, mark `deferred` or `human_required`.
+
+**Downgrade** (after verification passes): if a high-tier model solves a pattern, template the solution and batch-run with cheaper models.

@@ -20,8 +20,8 @@ services: ["chroma-hybrid-search"]
 - Call `python .devin/scripts/memory_audit.py --session <session_id>` to merge per-session candidate memory.
 - Extract 1-3 core takeaways from a completed task.
 - Each takeaway: trigger situation + correct action + counter-example.
-- Write JSONL to cold-notes (or `.devin/knowledge_distill.md` if deep-memory offline).
-- Write project spirit / one-shot judgment to `.devin/handoff_letter.md` (not `.devin/canon/HANDOFF_LETTER.md`).
+- Write JSONL to cold-notes (or `.agents/knowledge_distill.md` if deep-memory offline).
+- Write project spirit / one-shot judgment to `.agents/handoff_letter.md` (not `.devin/canon/HANDOFF_LETTER.md`).
 - Judge whether something is worth storing — most one-off details are NOT.
 
 ## Out of scope

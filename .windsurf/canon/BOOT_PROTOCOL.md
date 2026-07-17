@@ -8,7 +8,7 @@
 
 1. **Read entry file** — the file that brought you here (AGENTS.md / CLAUDE.md /
    instructions.md / .devin/AGENTS.md). It routes you to canon.
-2. **Ensure registry exists** — `.windsurf/loop_state.md` is the session registry.
+2. **Ensure registry exists** — `.agents/loop_state.md` is the session registry.
    If it does not exist, create an empty registry with front matter:
    ```yaml
    ---
@@ -17,13 +17,13 @@
    ---
    ```
    Do not write a `session_id` into the registry until the GoalSpec is finalized.
-3. **Read registry** — `.windsurf/loop_state.md` (<3KB). Inherit prior state:
+3. **Read registry** — `.agents/loop_state.md` (<3KB). Inherit prior state:
    `active_sessions`, `active_session`, and links to `knowledge_distill.md` and
    `handoff_letter.md`.
-4. **Read knowledge layer** — `.windsurf/knowledge_distill.md` (<8KB). Anti-patterns.
-5. **Read user profile** — `.windsurf/user_profile.md` (<2KB). Language, model tier,
+4. **Read knowledge layer** — `.agents/knowledge_distill.md` (<8KB). Anti-patterns.
+5. **Read user profile** — `.agents/user_profile.md` (<2KB). Language, model tier,
    project type, custom red lines.
-6. **Read handoff letter** — `.windsurf/handoff_letter.md` if it exists and `phase`
+6. **Read handoff letter** — `.agents/handoff_letter.md` if it exists and `phase`
    is `complete` or `last_update` is newer than the last known session.
 7. **Determine `session_id`** — choose or reuse a session ID:
    - Prefer a value supplied by the tool (`post_tool_use`/`stop` input or env var).
@@ -32,7 +32,7 @@
      session ID is reused **only after** the human confirms continuation.
    - Otherwise generate a new `session_id` (slug/UUID, max 64 chars, no `: / \`
      or spaces).
-8. **Read per-session context flags** — `.windsurf/context_flags/<session_id>.json`
+8. **Read per-session context flags** — `.agents/context_flags/<session_id>.json`
    if it exists. Carries `context_oversized` and any per-session signal.
 9. **Pre-task / crash audit** — run `python .windsurf/scripts/pre_task_audit.py --files <files> --tags <tags> --session <session_id>`:
    - It reads `session_state/<session_id>.json` for any session in `active_sessions`
@@ -45,8 +45,8 @@
      human whether to continue the previous session. **Never auto-resume.**
    - If no overlap, start a new session; the old session remains in the registry.
 10. **Read deploy guide** — `Docs/02-Deployment-Guide.md` (only if deploying).
-11. **Output GoalSpec** — write to `.windsurf/loop_state/<session_id>.md` and
-    `.windsurf/session_state/<session_id>.json`:
+11. **Output GoalSpec** — write to `.agents/loop_state/<session_id>.md` and
+    `.agents/session_state/<session_id>.json`:
     ```yaml
     session_id: "s-..."
     goal: "[one-line summary]"
@@ -65,7 +65,7 @@
     The machine-readable JSON in `session_state` must include `status: in_progress`,
     `state_written: false`, `last_state_write`, `last_heartbeat`, `owned_files`,
     `affected_files`, and `tags`.
-12. **Update registry** — append the new session to `.windsurf/loop_state.md` active
+12. **Update registry** — append the new session to `.agents/loop_state.md` active
     sessions table and set `active_session` to the new `session_id`. Then call
     `python .windsurf/scripts/loop_memory_sync.py` to regenerate the registry from the
     session state files.
@@ -73,7 +73,13 @@
     If not, set `deep_memory_offline: true`. Do not fabricate memory.
 14. **Large-repo init** (optional) — if the repo has >50 source files or >20 directories,
     consider running `init_deep` skill to build a code graph.
-15. **Differential gap-scan** — scan 1-2 scope angles only. See `.windsurf/rules/gap-scan.md`.
+15. **Task keyword lookup** — if `.agents/context_quick_lookup.md` exists (<3KB), read it.
+    It maps task keywords → required docs (O(1) lookup). Use it to decide which Docs to read.
+    If it does not exist, skip this step.
+16. **Project rules check** — if `user_profile.md` has `project_rules_dir` set, note the path.
+    If `project_rules_index` is set, read the index (<3KB) to know which project rules exist.
+    Load individual rule files on demand only — do NOT read all rules at BOOT.
+17. **Differential gap-scan** — scan 1-2 scope angles only. See `.windsurf/rules/gap-scan.md`.
 
 ## Rules
 

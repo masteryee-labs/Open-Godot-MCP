@@ -11,7 +11,7 @@ You are operating inside a **Agent Harness Deploy-distilled harness**:
 - **Commander + workers**: main thread decides, dispatches, integrates. Workers scan/edit. See `.hermes/agents/COMMANDER.md`.
 - **Parallel dispatch**: `.hermes/scripts/plan_dispatch.py` (file ownership) + `.hermes/scripts/worktree.py` (git worktree isolation). See `Docs/Agents/nuwa.md`.
 - **Nuwa cognitive angles**: before done, dispatch Nuwa verification (edge-case, dependency, regression). Vendored at `.hermes/skills/nuwa-skill/` (from alchaincyf/nuwa-skill, MIT). Three pre-distilled perspectives (Munger/Feynman/Taleb).
-- **Memory persists**: state on disk (`.hermes/loop_state.md` registry, `.hermes/loop_state/<session_id>.md` per-session state, `.hermes/session_state/<session_id>.json` machine state, and `.hermes/knowledge_distill.md`), not context. See `MEMORY_PROTOCOL.md`.
+- **Memory persists**: state on disk (`.agents/loop_state.md` registry, `.agents/loop_state/<session_id>.md` per-session state, `.agents/session_state/<session_id>.json` machine state, and `.agents/knowledge_distill.md`), not context. See `MEMORY_PROTOCOL.md`.
 - **Loops converge**: every iteration writes state, checks stop condition, stops when met or budget exhausted. See `LOOP_PROTOCOL.md`.
 - **Maker ≠ checker**: producer never verifies. Fresh context or CLI verifies. See `VERIFICATION_PROTOCOL.md`.
 
@@ -42,6 +42,20 @@ You are operating inside a **Agent Harness Deploy-distilled harness**:
 ## 4. Deploy contract
 
 When canon is being *installed* (not used): `python scripts/distill.py`. Detects tools, generates entry files, writes to native locations, verifies. See `Docs/02-Deployment-Guide.md`.
+
+## 4b. Project-specific rules layer
+
+Canon is universal (same across all projects). But real projects have detailed rules that don't fit in `user_profile.md` (<2KB). The **project rules layer** fills this gap:
+
+| Layer | Location | Owner | Example |
+|-------|----------|-------|---------|
+| Canon (universal) | `.hermes/canon/` | AHD deploys, project doesn't edit | BOOT_PROTOCOL, REDLINES |
+| Project rules | `.hermes/rules/` | Project owns, AHD doesn't touch | Game rendering rules, API conventions |
+| Project profile | `.agents/user_profile.md` | Project owns | Red line summaries, never-read list, `project_rules_dir` pointer |
+
+- `distill.py` **never overwrites** `.hermes/rules/`. It is project-owned.
+- `user_profile.md` has a `project_rules_dir` field (default: `.hermes/rules/`) and optional `project_rules_index` field pointing to an index file.
+- Canon's BOOT_PROTOCOL reads `user_profile.md` → if `project_rules_dir` is set, load the index on demand.
 
 ## 5. Canon file map
 

@@ -1,6 +1,6 @@
 ---
 name: user-preference
-description: "Use at BOOT and whenever a user preference is discovered. Loads and updates .hermes/user_profile.md to remember language, model tier, project type, and custom red lines."
+description: "Use at BOOT and whenever a user preference is discovered. Loads and updates .agents/user_profile.md to remember language, model tier, project type, and custom red lines."
 ---
 
 # Skill: user-preference
@@ -17,7 +17,7 @@ At BOOT and after any explicit preference statement.
 
 ## How
 
-1. Read `.hermes/user_profile.md` if it exists.
+1. Read `.agents/user_profile.md` if it exists.
 2. If it does not exist, create it from the template:
    ```yaml
    ---
@@ -27,6 +27,8 @@ At BOOT and after any explicit preference statement.
    communication_style: "caveman|verbose|balanced"
    never_read: []
    custom_red_lines: []
+   project_rules_dir: ""
+   project_rules_index: ""
    updated_at: ""
    ---
    ```
@@ -37,13 +39,15 @@ At BOOT and after any explicit preference statement.
    - `communication_style` from user feedback.
    - `never_read` from files the user says to skip.
    - `custom_red_lines` from user-imposed constraints.
+   - `project_rules_dir` if the project has a `.hermes/rules/` directory with detailed project-specific rules.
+   - `project_rules_index` if there's an index file (e.g., `.hermes/rules/project_rules.md`).
 4. Keep the file < 2KB. Merge, don't append blindly.
 5. Write `updated_at`.
 
 ## Output
 ```
 ## User profile
-- loaded from: .hermes/user_profile.md
+- loaded from: .agents/user_profile.md
 - updated: <fields>
 - active constraints: <list>
 ```

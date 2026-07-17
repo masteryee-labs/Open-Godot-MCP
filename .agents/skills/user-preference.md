@@ -27,6 +27,8 @@ At BOOT and after any explicit preference statement.
    communication_style: "caveman|verbose|balanced"
    never_read: []
    custom_red_lines: []
+   project_rules_dir: ""
+   project_rules_index: ""
    updated_at: ""
    ---
    ```
@@ -37,6 +39,8 @@ At BOOT and after any explicit preference statement.
    - `communication_style` from user feedback.
    - `never_read` from files the user says to skip.
    - `custom_red_lines` from user-imposed constraints.
+   - `project_rules_dir` if the project has a `.agents/rules/` directory with detailed project-specific rules.
+   - `project_rules_index` if there's an index file (e.g., `.agents/rules/project_rules.md`).
 4. Keep the file < 2KB. Merge, don't append blindly.
 5. Write `updated_at`.
 

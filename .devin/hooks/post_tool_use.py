@@ -8,10 +8,10 @@ Exit codes:
   0 = success (always — post-hooks never block)
 
 Writes per-session:
-- .devin/session_state/<session_id>.json — heartbeat, last_tool, last_file
-- .devin/session_state/<session_id>/candidate_memory.jsonl — repeated failure patterns
-- .devin/context_flags/<session_id>.json — context_oversized flag
-- .devin/session_state/<session_id>/journal.jsonl — audit trail
+- .agents/session_state/<session_id>.json — heartbeat, last_tool, last_file
+- .agents/session_state/<session_id>/candidate_memory.jsonl — repeated failure patterns
+- .agents/context_flags/<session_id>.json — context_oversized flag
+- .agents/session_state/<session_id>/journal.jsonl — audit trail
 
 This creates a persistent audit trail and helps the harness avoid the context dumb zone.
 """
@@ -269,7 +269,7 @@ def main():
                 f"(response > {CONTEXT_OVERSIZE_THRESHOLD} chars). "
                 f"Run context-compactor skill before continuing: "
                 f"offload full output to .devin/tmp/, keep head+tail+path in context. "
-                f"Read .devin/context_flags/{session_id}.json for details.",
+                f"Read .agents/context_flags/{session_id}.json for details.",
                 file=sys.stderr,
             )
         elif ahd_session.read_context_flags(session_id, root).get("context_oversized"):

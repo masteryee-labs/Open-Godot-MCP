@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """loop_memory_sync.py — regenerate loop_state.md registry from session_state.
 
-This is the single machine writer of `.codex/loop_state.md`. It reads:
-- `.codex/session_state/*.json` for active session metadata
-- `.codex/loop_state/<session_id>.md` for human-readable GoalSpec and subtasks
+This is the single machine writer of `.agents/loop_state.md`. It reads:
+- `.agents/session_state/*.json` for active session metadata
+- `.agents/loop_state/<session_id>.md` for human-readable GoalSpec and subtasks
 
 It writes:
-- `.codex/loop_state.md` registry (active + recent 3 completed)
+- `.agents/loop_state.md` registry (active + recent 3 completed)
 - `.codex/loop_state_archive.md` event summaries for archived sessions
 - moves completed session files to `.codex/loop_state_archive/<session_id>.md`
 """
@@ -303,8 +303,8 @@ def regenerate(root: Path, session_id: str = "", status: str = "") -> None:
 
     lines.append("")
     lines.append("## Links")
-    lines.append("- knowledge_distill: .codex/knowledge_distill.md")
-    lines.append("- handoff_letter: .codex/handoff_letter.md")
+    lines.append("- knowledge_distill: .agents/knowledge_distill.md")
+    lines.append("- handoff_letter: .agents/handoff_letter.md")
     lines.append("- session_archive: .codex/loop_state_archive.md")
     lines.append("- session_archive_dir: .codex/loop_state_archive/")
 
