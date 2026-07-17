@@ -17,6 +17,11 @@
    ---
    ```
    Do not write a `session_id` into the registry until the GoalSpec is finalized.
+   **One-time migration**: if shared state files (`user_profile.md`,
+   `knowledge_distill.md`, `handoff_letter.md`, `context_quick_lookup.md`)
+   are missing from `.agents/` but exist in `.hermes/`,
+   copy them to `.agents/`. This handles upgrade from older AHD
+   versions that stored these files per-tool.
 3. **Read registry** — `.hermes/loop_state.md` (<3KB). Inherit prior state:
    `active_sessions`, `active_session`, and links to `knowledge_distill.md` and
    `handoff_letter.md`.
