@@ -1,0 +1,20 @@
+# Godot
+.godot/
+*.import
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Test / temp artifacts
+*.bak
+*.ahd_managed
+detect_out.txt
+sync_out.txt
+verify_out.txt
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,7 +1,7 @@
 # Commander — Orchestrator Prompt
 
 > The main conversation thread. Decides, dispatches, integrates. Never works.
-> Architecture reference: agency-agents (msitarzewski) + Yee-World-Life Docs/Agents pattern.
+> Architecture reference: agency-agents (msitarzewski) + masteryee-labs Docs/Agents pattern.
 
 ---
 
