@@ -47,6 +47,41 @@ def get_config_root(root: Path) -> Path:
     return root / ".agents"
 
 
+def get_shared_state_root(root: Path) -> Path:
+    """Return the canonical shared-state root (always ``.hermes/``).
+
+    Shared state files (user_profile.md, knowledge_distill.md,
+    handoff_letter.md, context_quick_lookup.md) live at ``.hermes/`` and are
+    shared across all tools. Per-tool session state (loop_state.md,
+    session_state/, context_flags/) lives at the tool's config root.
+
+    Backward compatibility: if a shared state file exists in the tool's config
+    root but not in ``.hermes/``, this function still returns ``.hermes/``.
+    The caller should use ``resolve_shared_state_file()`` for automatic
+    migration fallback.
+    """
+    return root / ".agents"
+
+
+def resolve_shared_state_file(filename: str, root: Path) -> Path:
+    """Resolve a shared state file path with backward-compat fallback.
+
+    Checks ``.hermes/<filename>`` first (canonical location).
+    Falls back to ``<config_root>/<filename>`` (old AHD location) if the
+    canonical path doesn't exist but the old one does.
+
+    Does NOT copy — callers that need to persist should write to
+    ``get_shared_state_root(root) / filename``.
+    """
+    canonical = get_shared_state_root(root) / filename
+    if canonical.exists():
+        return canonical
+    old = get_config_root(root) / filename
+    if old.exists():
+        return old
+    return canonical  # default to canonical for new file creation
+
+
 def _lock_relpath(root: Path) -> Path:
     """Return the lock file path relative to the config root."""
     return get_config_root(root) / "tmp" / "ahd_session.lock"

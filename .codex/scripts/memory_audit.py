@@ -90,7 +90,10 @@ def _distill(entries: list[dict]) -> list[dict]:
 def run(root: Path, session_id: str) -> None:
     sid = ahd_session.slugify_session_id(session_id)
     candidate_path = ahd_session.get_config_root(root) / "session_state" / sid / "candidate_memory.jsonl"
-    knowledge_path = ahd_session.get_config_root(root) / "knowledge_distill.md"
+    # Read: fallback to old location for backward compat.
+    # Write: always to canonical .codex/ location.
+    read_path = ahd_session.resolve_shared_state_file("knowledge_distill.md", root)
+    write_path = ahd_session.get_shared_state_root(root) / "knowledge_distill.md"
 
     candidates = []
     if candidate_path.exists():
@@ -107,8 +110,8 @@ def run(root: Path, session_id: str) -> None:
         return
 
     existing = []
-    if knowledge_path.exists():
-        existing = _parse_knowledge_entries(knowledge_path.read_text(encoding="utf-8"))
+    if read_path.exists():
+        existing = _parse_knowledge_entries(read_path.read_text(encoding="utf-8"))
 
     merged = _dedupe(existing, candidates)
 
@@ -119,8 +122,8 @@ def run(root: Path, session_id: str) -> None:
 
     text = "\n\n".join(_format_entry(e) for e in merged)
 
-    # Write with lock
-    ahd_session._locked_text_write(knowledge_path, text)
+    # Write with lock to canonical .codex/ location
+    ahd_session._locked_text_write(write_path, text)
     # Clear candidate memory
     try:
         candidate_path.write_text("", encoding="utf-8")
