@@ -12,39 +12,78 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBox" type="VBoxContainer" parent="."]
+[node name="Scroll" type="ScrollContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+horizontal_scroll_mode = 0
+
+[node name="VBox" type="VBoxContainer" parent="Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 4
 
-[node name="Title" type="Label" parent="VBox"]
+[node name="Title" type="Label" parent="Scroll/VBox"]
 layout_mode = 2
 text = "Open Godot MCP"
+autowrap_mode = 2
 
-[node name="StatusLabel" type="Label" parent="VBox"]
+[node name="StatusLabel" type="Label" parent="Scroll/VBox"]
 layout_mode = 2
 text = "Status: Not connected"
+autowrap_mode = 2
 
-[node name="InfoLabel" type="Label" parent="VBox"]
+[node name="InfoLabel" type="Label" parent="Scroll/VBox"]
 layout_mode = 2
 text = ""
+autowrap_mode = 2
 
-[node name="Spacer" type="Control" parent="VBox"]
+[node name="UpdateBanner" type="VBoxContainer" parent="Scroll/VBox"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="UpdateLabel" type="Label" parent="Scroll/VBox/UpdateBanner"]
+layout_mode = 2
+autowrap_mode = 2
+size_flags_horizontal = 3
+
+[node name="UpdateBtnRow" type="HBoxContainer" parent="Scroll/VBox/UpdateBanner"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="UpdateBtn" type="Button" parent="Scroll/VBox/UpdateBanner/UpdateBtnRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Update"
+
+[node name="ReleaseNotesBtn" type="Button" parent="Scroll/VBox/UpdateBanner/UpdateBtnRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Release notes"
+
+[node name="UpdateSeparator" type="HSeparator" parent="Scroll/VBox/UpdateBanner"]
+layout_mode = 2
+
+[node name="Spacer" type="Control" parent="Scroll/VBox"]
 custom_minimum_size = Vector2(0, 4)
 layout_mode = 2
 
-[node name="ReconnectBtn" type="Button" parent="VBox"]
+[node name="ReconnectBtn" type="Button" parent="Scroll/VBox"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Reconnect"
 
-[node name="SettingsBtn" type="Button" parent="VBox"]
+[node name="SettingsBtn" type="Button" parent="Scroll/VBox"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Settings"
 
-[node name="LogBtn" type="Button" parent="VBox"]
+[node name="LogBtn" type="Button" parent="Scroll/VBox"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "View Log"

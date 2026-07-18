@@ -15,6 +15,7 @@ const _BridgeServer = preload("res://addons/open_godot_mcp/bridge/websocket_serv
 const _DockScene = preload("res://addons/open_godot_mcp/dock/mcp_dock.tscn")
 const _ExportPlugin = preload("res://addons/open_godot_mcp/export/mcp_export_plugin.gd")
 const _DebuggerPlugin = preload("res://addons/open_godot_mcp/debugger/mcp_debugger_plugin.gd")
+const _UpdateReloadRunner = preload("res://addons/open_godot_mcp/utils/update_reload_runner.gd")
 
 var _server: Node
 var _dock: Control
@@ -41,6 +42,7 @@ func _enter_tree() -> void:
 	_dock = _DockScene.instantiate()
 	add_control_to_dock(EditorPlugin.DOCK_SLOT_RIGHT_BL, _dock)
 	_dock.set_server(_server)
+	_dock.set_plugin(self)
 
 	# Export plugin — strips runtime on export (Runtime-Autoload.md §匯出)
 	_export_plugin = _ExportPlugin.new()
@@ -90,6 +92,21 @@ func _exit_tree() -> void:
 		_server.stop_server()
 		_server.queue_free()
 		_server = null
+
+
+# ---- Self-update (called by update_manager.gd) ----
+
+func install_downloaded_update(zip_path: String, temp_dir: String, dock: Control) -> void:
+	# Stop the bridge server and detach the dock before the runner
+	# overwrites plugin scripts on disk.
+	if _server:
+		_server.stop_server()
+	if _dock:
+		remove_control_from_docks(_dock)
+	# The runner takes ownership of the dock and frees it after reload.
+	var runner := _UpdateReloadRunner.new()
+	EditorInterface.get_base_control().add_child(runner)
+	runner.start(zip_path, temp_dir, dock)
 
 
 func _ensure_editor_settings() -> void:

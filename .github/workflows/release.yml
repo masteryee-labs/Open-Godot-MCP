@@ -1,0 +1,37 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build-plugin-zip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build plugin ZIP
+        run: |
+          # Create the plugin ZIP with the correct structure:
+          # addons/open_godot_mcp/... (all addon files)
+          # Exclude .uid files for .tscn/.gd that are editor-specific
+          # but keep .uid files so Godot 4.5+ can resolve quickly.
+          cd "$GITHUB_WORKSPACE"
+          zip -r open-godot-mcp-plugin.zip \
+            addons/open_godot_mcp/ \
+            -x "addons/open_godot_mcp/*.bak.*" \
+            -x "addons/open_godot_mcp/**/*.bak.*"
+
+      - name: Generate SHA-256 checksum
+        run: |
+          sha256sum open-godot-mcp-plugin.zip > open-godot-mcp-plugin.zip.sha256
+
+      - name: Upload plugin ZIP to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            open-godot-mcp-plugin.zip
+            open-godot-mcp-plugin.zip.sha256
