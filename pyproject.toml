@@ -1,0 +1,75 @@
+[build-system]
+requires = ["hatchling>=1.21.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "open-godot-mcp"
+version = "0.1.0"
+description = "Open-source, full-featured MCP server for AI-driven Godot game development, testing, and debugging"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [
+    { name = "MasterYee Labs", email = "dev@masteryee-labs.com" },
+]
+keywords = ["mcp", "godot", "ai", "game-development", "playtesting", "model-context-protocol"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Games/Entertainment",
+    "Topic :: Software Development :: Debuggers",
+    "Topic :: Software Development :: Testing",
+]
+dependencies = [
+    "fastmcp==3.4.4",
+    "websockets>=15.0,<16.0",
+    "anyio>=4.0,<5.0",
+    "httpx>=0.27,<1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0,<9.0",
+    "pytest-asyncio>=0.24,<1.0",
+    "pytest-cov>=5.0,<7.0",
+    "ruff>=0.6,<1.0",
+    "mypy>=1.11,<2.0",
+]
+
+[project.scripts]
+open-godot-mcp = "open_godot_mcp.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/masteryee-labs/Open-Godot-MCP"
+Repository = "https://github.com/masteryee-labs/Open-Godot-MCP"
+Documentation = "https://github.com/masteryee-labs/Open-Godot-MCP/tree/main/Docs"
+Issues = "https://github.com/masteryee-labs/Open-Godot-MCP/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/open_godot_mcp"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"addons" = "share/open_godot_mcp/addons"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+check_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"

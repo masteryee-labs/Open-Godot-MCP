@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Open Godot MCP Discussions
+    url: https://github.com/masteryee-labs/Open-Godot-MCP/discussions
+    about: Ask questions and discuss with the community
+  - name: Documentation
+    url: https://github.com/masteryee-labs/Open-Godot-MCP/tree/main/Docs
+    about: Read the full documentation before opening an issue

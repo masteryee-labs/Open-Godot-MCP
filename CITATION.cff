@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Open Godot MCP"
+abstract: "Open-source Model Context Protocol server for AI-autonomous Godot game development, testing, and debugging. Features deterministic playtesting, multiplayer testing, DAP debugging, LSP integration, and token-efficient design."
+authors:
+  - given-names: "MasterYee"
+    family-names: "Labs"
+    email: "dev@masteryee-labs.com"
+keywords:
+  - "godot"
+  - "mcp"
+  - "model-context-protocol"
+  - "game-development"
+  - "playtesting"
+  - "debugging"
+  - "ai"
+  - "open-source"
+license: "MIT"
+repository-code: "https://github.com/masteryee-labs/Open-Godot-MCP"
+version: "0.1.0"
+date-released: "2026-07-18"

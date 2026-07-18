@@ -293,6 +293,64 @@
 ## Phase 6：未來擴展
 
 > 目標：進階功能，按社群需求推進。
+>
+> **缺口來源**：[../09-Research/Paid-MCP-Analysis.md](../09-Research/Paid-MCP-Analysis.md) 的論壇調研與競品分析。
+
+### 6.0 競爭力缺口（立即補）
+
+> 這些是付費競品都有、論壇開發者重複要求、但 Open Godot MCP 缺少的功能。
+
+#### 6.0.1 Undo/Redo 支援
+
+- [ ] `godot_node_edit` create/delete/reparent/set_property 包入 `EditorUndoRedoManager`
+- [ ] `godot_scene` create/save 包入 undo action
+- [ ] `godot_script` edit 包入 undo action
+- [ ] 場景 dirty 標記（`mark_scene_as_unsaved()`）
+
+#### 6.0.2 Signal 連接管理
+
+- [ ] `godot_node_edit connect_signal`（source, signal, target, method）
+- [ ] `godot_node_edit disconnect_signal`
+- [ ] `godot_node_read get_signals`（列出所有 signal + connections）
+
+#### 6.0.3 Node Groups
+
+- [ ] `godot_node_edit set_groups` / `add_to_group` / `remove_from_group`
+- [ ] `godot_node_read get_groups`
+- [ ] `godot_node_read find_in_group`
+
+#### 6.0.4 Batch Node Creation
+
+- [ ] `godot_node_edit create_batch`（一次建多個 node，partial 失敗回滾）
+
+#### 6.0.5 Assert / Verification
+
+- [ ] `godot_assert`（在遊戲進程內執行條件判斷）
+- [ ] `godot_assert_screen_text`（OCR 或 pixel match）
+- [ ] `godot_assert_image_diff`（baseline 比對 + tolerance）
+
+#### 6.0.6 Input Recording / Replay
+
+- [ ] `godot_input record_start` / `record_stop`
+- [ ] `godot_input replay`（確定性回放）
+- [ ] 錄製格式序列化（JSON time-series）
+
+#### 6.0.7 DAP 擴充
+
+- [ ] `godot_debugger set_breakpoint`（含 condition）
+- [ ] `godot_debugger remove_breakpoint`
+- [ ] `godot_debugger resume` / `step_over` / `step_into`
+- [ ] `godot_debugger stack_trace`
+- [ ] `godot_debugger variables`
+- [ ] 自動連線（遊戲 pause 時自動報告）
+
+#### 6.0.8 C# Compile-Check
+
+> 詳見 [../08-CSharp-Support/Compatibility.md](../08-CSharp-Support/Compatibility.md) 與 [../08-CSharp-Support/Syntax-Check.md](../08-CSharp-Support/Syntax-Check.md)。
+
+- [ ] `godot_csharp_check`（syntax, build, analyze）— Roslyn syntax-first 語法檢查
+- [ ] `godot_csharp_script`（C# 檔案讀寫 + Roslyn 整合）
+- [ ] C# 專案自動偵測與模式切換
 
 ### 6.1 AI 工作流增強
 
@@ -302,28 +360,39 @@
 
 ### 6.2 更多 Godot 功能
 
-- [ ] AnimationTree 操作
-- [ ] Shader 編輯
-- [ ] NavigationServer 操作
-- [ ] PhysicsServer 直接操作
+- [ ] AnimationTree 操作（state machine, blend tree, transitions）
+- [ ] Shader 編輯（create/edit/assign/params）
+- [ ] NavigationServer 操作（nav mesh bake, agent, pathfinding）
+- [ ] PhysicsServer 直接操作（collision setup, layers, raycasts）
+- [ ] Audio 控制（player, bus effects chain）
+- [ ] Theme/UI overrides（StyleBoxFlat, color/font overrides）
+- [ ] Particles（GPU particles + presets）
+- [ ] 3D Scene 建構（MeshInstance, PBR material, lighting, camera）
 
-### 6.3 C# Godot 支援
+### 6.3 程式碼分析（靜態）
 
-> 詳見 [../08-CSharp-Support/Compatibility.md](../08-CSharp-Support/Compatibility.md) 與 [../08-CSharp-Support/Syntax-Check.md](../08-CSharp-Support/Syntax-Check.md)。
+- [ ] `godot_analyze dependency_graph`（preload/load 引用圖譜）
+- [ ] `godot_analyze signal_map`（signal 連接流向圖）
+- [ ] `godot_analyze impact_check`（變更影響分析）
+- [ ] `godot_analyze unused_resources`（未使用資源偵測）
+- [ ] `godot_analyze project_summary`（專案結構摘要）
 
-- [ ] `godot_csharp_check`（syntax, build, analyze）— Roslyn syntax-first 語法檢查
-- [ ] `godot_csharp_script`（C# 檔案讀寫 + Roslyn 整合）
-- [ ] `[McpWatch]` C# 屬性標記 + 反射掃描
-- [ ] C# 專案自動偵測與模式切換
-- [ ] `godot_exec call` C# 方法呼叫驗證
+### 6.4 MCP 協議完整性
 
-### 6.4 團隊協作
+- [ ] MCP Resources（`godot://editor/state` 等）
+- [ ] MCP Prompts（`playtest` / `debug_breakpoint` / `network_test`）
+- [ ] Tool annotations（read-only / destructive / open-world）
+- [ ] `tools/list_changed` 通知
+- [ ] Effort slider（動態控制 advertised tools 數量）
+
+### 6.5 團隊協作
 
 - [ ] 多 AI client 共享 session
 - [ ] 操作錄製與回放
 - [ ] Git 整合
+- [ ] Audit log（最近 200 次呼叫記錄）
 
-### 6.5 雲端測試
+### 6.6 雲端測試
 
 - [ ] 遠端 Godot 實例管理
 - [ ] 雲端 multiplayer 測試（真實跨網路）

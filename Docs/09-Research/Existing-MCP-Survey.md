@@ -1,22 +1,45 @@
 # 現有 Godot MCP 調研
 
-> 對 10+ 現有 Godot MCP 專案的調研結果。Open Godot MCP 的設計基於此調研的「截優去短」。
+> 對 20+ 現有 Godot MCP 專案的調研結果。Open Godot MCP 的設計基於此調研的「截優去短」。
+>
+> **付費競品分析**：[Paid-MCP-Analysis.md](Paid-MCP-Analysis.md)
 
 ---
 
 ## 調研的專案
+
+### 免費開源
 
 | 專案 | Stars | 語言 | 核心特色 |
 |------|-------|------|----------|
 | [Coding-Solo/godot-mcp](https://github.com/Coding-Solo/godot-mcp) | 4.8k | TS + GDScript | 基礎架構典範 |
 | [satelliteoflove/godot-mcp](https://github.com/satelliteoflove/godot-mcp) | 124 | TS + GDScript | 確定性 playtesting、cheap observation |
 | [hi-godot/godot-ai](https://github.com/hi-godot/godot-ai) | — | Python + GDScript | debugger channel、Undo/Redo、port reservation |
-| [tomyud1/godot-mcp](https://github.com/tomyud1/godot-mcp) | — | TS + GDScript | 雙通道、Variant 序列化（連線不穩） |
+| [tomyud1/godot-mcp](https://github.com/tomyud1/godot-mcp) | 392 | TS + GDScript | 雙通道、Variant 序列化、視覺化工具 |
 | [rosskarchner/godot-mcp](https://github.com/rosskarchner/godot-mcp) | 1 | Python + GDScript | DAP + LSP、多實例 |
 | [Erodenn/godot-mcp-runtime](https://github.com/Erodenn/godot-mcp-runtime) | 47 | TS + GDScript | zero-footprint、Playwright for Godot |
 | [thediymaker/godot-mcp](https://github.com/thediymaker/godot-mcp) | — | TS + GDScript | 149 tools（功能廣但 token 重） |
 | [Rufaty/godot-mcp-enhanced](https://github.com/Rufaty/godot-mcp-enhanced) | — | TS + GDScript | 即時互動、輸入模擬 |
 | [Sods2/godot-mcp](https://github.com/Sods2/godot-mcp) | — | TS + GDScript | IDE 整合 |
+| [yurineko73/Godot-MCP-Native](https://github.com/yurineko73/Godot-MCP-Native) | 415 | GDScript | 純原生、155 tools、無需 Node.js |
+| [Farraskuy/Godot-MCP](https://github.com/Farraskuy/Godot-MCP) | — | TS + GDScript | 168 tools、25 categories、UndoRedo |
+| [tugcantopaloglu/godot-mcp](https://github.com/tugcantopaloglu/godot-mcp) | — | TS + GDScript | 157 tools、C# support、3D/Nav/Shader |
+| [IvanMurzak/Godot-MCP](https://github.com/IvanMurzak/Godot-MCP) | — | C# + GDScript | C# editor addon、雲端後端 |
+| [LuoxuanLove/godot-dotnet-mcp](https://github.com/LuoxuanLove/godot-dotnet-mcp) | — | C# + GDScript | Roslyn C# 語法診斷、.NET 專用 |
+| [LeanderM99/GodotMCP](https://github.com/LeanderM99/GodotMCP) | — | TS + C# | C# EditorPlugin、.NET 專用 |
+| [TransitionMatrix/godot-dap-mcp-server](https://github.com/TransitionMatrix/godot-dap-mcp-server) | — | Go | DAP debugging 專用 |
+| [marcushale/godot-ai-playtest](https://github.com/marcushale/godot-ai-playtest) | — | Python + GDScript | 外部 TCP 控制、CI 整合 |
+| [mrf/godot-stagehand](https://github.com/mrf/godot-stagehand) | — | Go + GDScript | Playwright for Godot、視覺回歸 |
+| [koltyakov/godot-mcp](https://github.com/koltyakov/godot-mcp) | — | TS + GDScript | MCP Resources/Prompts、godot:// resources |
+
+### 付費
+
+| 專案 | 定價 | 工具數 | 核心賣點 |
+|------|------|--------|----------|
+| [Godot MCP Pro](https://y1uda.itch.io/godot-mcp-pro) | $15 | 175 | 工具廣度、23 類別 |
+| [GodotIQ Pro](https://godotiq.com) | $19 | 24+14 | 靜態分析智慧工具 |
+| [Beckett Full](https://beckettlabs.itch.io/beckett-godot-mcp) | $15 | 37 packs | AI playtest + assert + screenshot diff |
+| [StraySpark](https://www.strayspark.studio/products/godot-mcp-server) | $32-$96 | 131 | 完整 + 商用授權 |
 
 ---
 

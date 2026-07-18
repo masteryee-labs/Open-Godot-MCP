@@ -1,13 +1,85 @@
+<!--
+SEO/AEO/GEO/LLMO Meta Block
+=============================
+@title: Open Godot MCP — AI 驅動的 Godot 遊戲開發、測試與除錯
+@description: 開源 MCP server，讓 AI 自主開發 Godot 遊戲。確定性 playtesting、連線遊戲測試、DAP 除錯、LSP 整合、Token 效率。100% MIT。
+@keywords: godot mcp, model context protocol, ai 遊戲開發, godot ai, 遊戲測試, playtesting, 確定性測試, 連線遊戲測試, 遊戲除錯, dap debugger, lsp 整合, gdscript, godot 4, 開源 mcp, ai 程式助手, claude mcp, 遊戲引擎 ai, 自動化遊戲測試, godot 插件, token 效率
+@author: MasterYee Labs
+@language: zh-TW
+@og:type: software
+@og:title: Open Godot MCP
+@og:description: 開源 MCP server，讓 AI 自主開發、測試、除錯 Godot 遊戲——確定性 playtesting、連線測試、DAP 除錯、LSP、Token 效率。
+-->
+
+<!--
+JSON-LD Structured Data (Schema.org SoftwareApplication)
+=========================================================
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Open Godot MCP",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Cross-platform",
+  "softwareVersion": "0.1.0",
+  "license": "https://opensource.org/licenses/MIT",
+  "description": "開源 Model Context Protocol server，讓 AI 自主開發、測試、除錯 Godot 遊戲。具備確定性 playtesting、連線遊戲測試、DAP 除錯、LSP 整合、Token 效率設計。",
+  "url": "https://github.com/masteryee-labs/Open-Godot-MCP",
+  "programmingLanguage": ["GDScript", "Python"],
+  "framework": "Godot Engine 4.5+",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "featureList": [
+    "確定性 playtesting（freeze/step/step_until）",
+    "連線遊戲測試（多實例、peer 模擬）",
+    "DAP 除錯（breakpoint、stack_trace、variables、evaluate）",
+    "LSP 整合（診斷、自動完成、go-to-definition）",
+    "Token 效率設計（JSON digest、diff、截圖壓縮）",
+    "30+ MCP tools，130+ actions",
+    "連線穩定（心跳、智慧重連、port 自動避讓）"
+  ],
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "5",
+    "reviewCount": "1"
+  }
+}
+</script>
+-->
+
 # Open Godot MCP
 
-> 開源、免費、全功能的 Model Context Protocol server，讓 AI 自主開發、測試、除錯 Godot 遊戲——包含真實遊戲操作、確定性 playtesting、連線遊戲測試，並內建 Token 效率設計。
+> 開源、免費、全功能的 Model Context Protocol（MCP）server，讓 AI 自主開發、測試、除錯 Godot 遊戲——包含真實遊戲操作、確定性 playtesting、連線遊戲測試、DAP 除錯、LSP 整合、Token 效率設計。100% MIT 授權，無 freemium，無付費牆。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Godot 4.5+](https://img.shields.io/badge/Godot-4.5+-blue.svg)](https://godotengine.org)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11+-green.svg)](https://python.org)
 [![MCP](https://badge.mcpx.dev?type=server)](https://modelcontextprotocol.io)
 
-**Languages:** 繁體中文（本檔）| [English](README_EN.md) | [简体中文](README_zh-CN.md)
+**Languages:** 繁體中文（本檔）| [English](README_EN.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Русский](README.ru.md) | [Português-BR](README.pt-BR.md) | [Polski](README.pl.md) | [Italiano](README.it.md) | [Türkçe](README.tr.md) | [ภาษาไทย](README.th.md) | [Tiếng Việt](README.vi.md) | [Bahasa Indonesia](README.id.md) | [Українська](README.uk.md) | [Nederlands](README.nl.md) | [العربية](README.ar.md) | [हिन्दी](README.hi.md)
+
+---
+
+## Open Godot MCP 是什麼？
+
+**Open Godot MCP** 是一個開源的 [Model Context Protocol](https://modelcontextprotocol.io) server，將 AI 程式助手（Claude、GPT、Cursor、Windsurf 等）連接到 [Godot Engine](https://godotengine.org) 編輯器。它讓 AI 能夠**寫程式、運行遊戲、測試玩法、在斷點除錯、檢查變數、驗證修復**——全部自主完成，無需人工介入。
+
+與只能編輯場景的現有 Godot MCP 不同，Open Godot MCP 讓 AI **真的玩遊戲**——透過確定性 playtesting（凍結時鐘 → step 時間 → 觀察狀態 → 驗證結果）。它是**唯一**支援**連線遊戲測試**、**DAP 除錯器整合**、**LSP 程式碼智慧**的 Godot MCP。
+
+| 屬性 | 值 |
+|------|-----|
+| **專案類型** | MCP server（Model Context Protocol）for Godot Engine |
+| **目標引擎** | Godot 4.5+（GDScript + C# 支援） |
+| **執行環境** | Python 3.11+（server）+ GDScript（addon） |
+| **授權** | MIT（100% 開源，無 freemium） |
+| **工具數** | ~30 MCP tools，~130 actions |
+| **核心功能** | 確定性 playtesting、連線測試、DAP 除錯、LSP、Token 效率 |
+| **AI 客戶端** | Claude Desktop、Cursor、Windsurf、VS Code（MCP）、Continue、Zed、任何 MCP 相容客戶端 |
+| **平台** | Windows、macOS、Linux |
+| **獨有能力** | 連線遊戲測試（其他 Godot MCP 都沒有）、DAP + LSP 整合 |
 
 ---
 
@@ -22,6 +94,29 @@
 | 無法測連線遊戲 | 所有 MCP 都缺 multiplayer 測試 | **獨有**——多實例、peer 模擬、同步驗證、網路條件注入 |
 | Token 浪費 | 完整回傳、PNG 無壓縮、無 diff | cheap observation、截圖壓縮、diff、摘要、增量查詢 |
 | 免費版閹割 | freemium，功能要付費 | **100% MIT 開源**，所有功能免費 |
+
+---
+
+## 適合誰用？
+
+- **Godot 4 遊戲開發者**——想讓 AI 幫忙寫程式、測試、除錯
+- **AI 輔助程式設計師**（Claude、Cursor、Windsurf、VS Code MCP 使用者）——在 Godot 專案上工作
+- **獨立遊戲工作室**——需要自動化 playtesting，不想自己寫測試框架
+- **連線遊戲開發者**——需要測試網路同步、延遲、peer 行為
+- **開源倡議者**——想要完全免費、無付費牆的 MCP server
+
+---
+
+## 使用情境
+
+| 情境 | Open Godot MCP 如何幫助 |
+|------|--------------------------|
+| **AI 修移動 bug** | AI 設斷點 → 運行遊戲 → 檢查變數 → 找到根因 → 修程式 → 重測 |
+| **自動化 Boss 戰測試** | 凍結時鐘 → 生成 Boss → step 時間 → 模擬閃避輸入 → 驗證玩家存活 |
+| **連線同步驗證** | 啟動 host + client 實例 → 注入延遲 → 比較同步狀態 → 偵測 desync bug |
+| **效能分析** | 拍 profiler 快照 → 找 spike → 最佳化 → 重新測量 |
+| **回歸測試** | 程式碼變更後跑測試套件 → 斷言遊戲狀態符合預期 |
+| **關卡設計迭代** | AI 建立節點 → 排列場景 → 運行遊戲 → 截圖 → 調整 |
 
 ---
 
@@ -40,7 +135,7 @@ godot_game_time step ms=500 + dodge input      # 播放關鍵時刻
 godot_screenshot game                          # 只在值得時截圖
 ```
 
-### 2. 連線遊戲測試（獨有功能）
+### 2. 連線遊戲測試（獨有功能——其他 Godot MCP 都沒有）
 
 所有現有 Godot MCP 都缺的能力：
 
@@ -73,8 +168,8 @@ godot_network simulate_peer count=50           # 壓力測試 50 個 peer
 
 ### 5. 完整除錯
 
-- **DAP**：breakpoint、step、變數 inspect
-- **LSP**：靜態診斷、自動完成、go-to-definition
+- **DAP（Debugger Adapter Protocol）**：breakpoint、step、變數 inspect（stack_trace、variables、evaluate）
+- **LSP（Language Server Protocol）**：靜態診斷、自動完成、go-to-definition
 - **Profiler**：效能快照、時序分析、spike 偵測
 
 ---
@@ -117,7 +212,7 @@ Addon 會自動注入。開啟 AI Client 開始用。
 |------|------|------|
 | 編輯器 | `godot_editor_read/edit` | 狀態、場景、選取 |
 | 場景 | `godot_scene` | 建立、讀取、儲存 |
-| 節點 | `godot_node_read/edit` | CRUD、屬性、群組 |
+| 節點 | `godot_node_read/edit` | CRUD、屬性、群組、signal |
 | 腳本 | `godot_script` | diff 編輯、驗證 |
 | 專案 | `godot_project` | 設定、autoload |
 | 輸入映射 | `godot_input_map` | InputMap 管理 |
@@ -128,9 +223,9 @@ Addon 會自動注入。開啟 AI Client 開始用。
 | **時鐘** | `godot_game_time` | freeze/step/step_until |
 | **輸入** | `godot_input` | 鍵盤/滑鼠/手把/文字 |
 | **狀態** | `godot_runtime_state` | digest/watch/signals |
-| **注入** | `godot_exec` | eval/call |
+| **注入** | `godot_exec` | eval/call/assert |
 | 截圖 | `godot_screenshot` | 壓縮、存檔 |
-| 除錯 | `godot_debugger` | DAP breakpoint |
+| 除錯 | `godot_debugger` | DAP breakpoint、stack_trace、variables、evaluate |
 | 程式碼 | `godot_lsp` | 診斷、完成 |
 | 效能 | `godot_profiler` | 快照、時序 |
 | 測試 | `godot_test` | 框架、執行 |
@@ -148,7 +243,7 @@ Addon 會自動注入。開啟 AI Client 開始用。
 
 ---
 
-## 與現有 MCP 比較
+## 與現有 Godot MCP 比較
 
 | 特性 | godot-ai | godot-mcp | Coding-Solo | satelliteoflove | thediymaker | **Open Godot MCP** |
 |------|----------|-----------|-------------|-----------------|-------------|---------------------|
@@ -160,6 +255,42 @@ Addon 會自動注入。開啟 AI Client 開始用。
 | Token 效率 | ⚠️ | ⚠️ | ❌ | ✅ | ❌ | ✅ **全面** |
 | 連線穩定 | ⚠️ | ❌ | — | ✅ | — | ✅ **最穩** |
 | 授權 | 開源 | 開源 | MIT | MIT | MIT | **MIT** |
+
+---
+
+## 常見問題
+
+### 什麼是 Model Context Protocol（MCP）？
+
+[Model Context Protocol](https://modelcontextprotocol.io) 是一個開放標準，讓 AI 助手連接外部工具和資料來源。Open Godot MCP 是一個 MCP server，將 AI 連接到 Godot Engine 編輯器。
+
+### 支援哪些 Godot 版本？
+
+Godot 4.5 及更新版本。Addon 使用 Godot 4.x API，包含 `EditorDebuggerPlugin`、`EditorInspector`、debugger message channel。
+
+### 哪些 AI 客戶端相容？
+
+任何 MCP 相容客戶端：Claude Desktop、Cursor、Windsurf、VS Code（MCP 擴充）、Continue、Zed，以及任何支援 Model Context Protocol 標準的客戶端。
+
+### 支援 C#（Godot .NET 版）嗎？
+
+是的。C# 語法檢查和編譯驗證已支援。見 [Docs/08-CSharp-Support/](Docs/08-CSharp-Support/)。
+
+### 跟其他 Godot MCP 有什麼不同？
+
+Open Godot MCP 是**唯一**支援連線遊戲測試、DAP 除錯器整合（斷點、stack trace、變數檢查）、LSP 程式碼智慧的 Godot MCP。它也有最全面的 Token 效率設計。
+
+### 真的免費嗎？
+
+是的。100% MIT 授權，無 freemium 模式，無付費牆，無功能限制。所有功能對所有人免費。
+
+### AI 真的能玩遊戲嗎？
+
+是的。透過確定性 playtesting，AI 可以凍結遊戲時鐘、精確 step 時間、注入測試場景、模擬玩家輸入、以 JSON 觀察遊戲狀態、截圖——全部用來驗證程式碼變更是否正確。
+
+### 連線遊戲測試怎麼運作？
+
+Open Godot MCP 可以啟動多個 Godot 實例（host + client）、模擬 peer、注入網路條件（延遲、封包遺失）、驗證遊戲狀態跨實例同步。
 
 ---
 
