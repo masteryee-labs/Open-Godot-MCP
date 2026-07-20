@@ -12,6 +12,7 @@ venv/
 *.bak
 *.bak.*
 *.ahd_managed
+.agents/qa_fix/
 detect_out.txt
 sync_out.txt
 verify_out.txt
