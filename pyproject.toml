@@ -10,7 +10,7 @@ readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11"
 authors = [
-    { name = "MasterYee Labs", email = "dev@masteryee-labs.com" },
+    { name = "MasterYee Labs", email = "masteryee-labs@users.noreply.github.com" },
 ]
 keywords = ["mcp", "godot", "ai", "game-development", "playtesting", "model-context-protocol"]
 classifiers = [

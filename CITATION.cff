@@ -5,7 +5,7 @@ abstract: "Open-source Model Context Protocol server for AI-autonomous Godot gam
 authors:
   - given-names: "MasterYee"
     family-names: "Labs"
-    email: "dev@masteryee-labs.com"
+    email: "masteryee-labs@users.noreply.github.com"
 keywords:
   - "godot"
   - "mcp"
