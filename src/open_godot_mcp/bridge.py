@@ -46,6 +46,10 @@ SUSPECTED_DEAD_THRESHOLD = 3  # consecutive misses -> disconnect + reconnect
 # Reconnect (Connection-Stability.md §對策 4)
 RECONNECT_BACKOFF = [1, 2, 4, 8, 16, 30]  # seconds, 30s cap
 RECONNECT_MAX_ATTEMPTS = 20
+# After the bounded backoff sequence exhausts, keep retrying at this slow
+# interval so the bridge recovers when Godot comes back instead of giving
+# up permanently (spec §對策 4: "不靜默失敗").
+RECONNECT_SLOW_INTERVAL = 60.0
 
 # Backpressure (Connection-Stability.md §封包與背壓控制)
 OUTBOUND_BUFFER_LIMIT = 4 * 1024 * 1024
@@ -84,6 +88,7 @@ class BridgeClient:
     _missed_pongs: int = 0
     _last_pong: float = 0.0
     _reconnect_attempts: int = 0
+    _connect_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
     _closed: bool = False
     # Bridge -> Server event queue (for game_started, runtime_ready, etc.)
     _events: asyncio.Queue[dict] = field(default_factory=asyncio.Queue)
@@ -108,6 +113,26 @@ class BridgeClient:
         """Connect to the bridge, perform handshake. Returns True on success."""
         if self._closed:
             return False
+        async with self._connect_lock:
+            if self._connected and self._ws is not None:
+                return True
+            # Tear down any stale connection before reconnecting to avoid
+            # duplicate recv/heartbeat loops racing on the same socket.
+            for task in (self._heartbeat_task, self._recv_task):
+                if task and not task.done():
+                    task.cancel()
+            self._heartbeat_task = None
+            self._recv_task = None
+            if self._ws is not None:
+                try:
+                    await self._ws.close()
+                except Exception:
+                    pass
+                self._ws = None
+            self._connected = False
+            return await self._do_connect()
+
+    async def _do_connect(self) -> bool:
         url = f"ws://{self.host}:{self.port}"
         try:
             self._ws = await asyncio.wait_for(
@@ -197,30 +222,33 @@ class BridgeClient:
         self._pending.clear()
 
     async def reconnect(self) -> bool:
-        """Attempt to reconnect with exponential backoff."""
-        self._connected = False
-        if self._ws:
-            try:
-                await self._ws.close()
-            except Exception:
-                pass
-            self._ws = None
-        for task in (self._heartbeat_task, self._recv_task):
-            if task and not task.done():
-                task.cancel()
-        self._heartbeat_task = None
-        self._recv_task = None
+        """Attempt to reconnect with exponential backoff, then slow-stream.
 
-        while self._reconnect_attempts < RECONNECT_MAX_ATTEMPTS and not self._closed:
-            idx = min(self._reconnect_attempts, len(RECONNECT_BACKOFF) - 1)
-            delay = RECONNECT_BACKOFF[idx]
-            log.info("Reconnect attempt %d/%d in %.1fs", self._reconnect_attempts + 1, RECONNECT_MAX_ATTEMPTS, delay)
+        Runs the bounded backoff sequence (1s..30s, 20 attempts). If that
+        exhausts, switches to slow-stream (every RECONNECT_SLOW_INTERVAL)
+        indefinitely so the bridge recovers when Godot comes back instead
+        of giving up permanently. Teardown of any stale connection is
+        handled by ``connect()`` under the connect lock.
+        """
+        while not self._closed:
+            if self._reconnect_attempts < RECONNECT_MAX_ATTEMPTS:
+                idx = min(self._reconnect_attempts, len(RECONNECT_BACKOFF) - 1)
+                delay = RECONNECT_BACKOFF[idx]
+                log.info(
+                    "Reconnect attempt %d/%d in %.1fs",
+                    self._reconnect_attempts + 1,
+                    RECONNECT_MAX_ATTEMPTS,
+                    delay,
+                )
+            else:
+                delay = RECONNECT_SLOW_INTERVAL
+                log.info("Reconnect in slow-stream (every %.0fs)", delay)
             await asyncio.sleep(delay)
+            if self._closed:
+                break
             self._reconnect_attempts += 1
             if await self.connect():
                 return True
-        if self._reconnect_attempts >= RECONNECT_MAX_ATTEMPTS:
-            log.error("Reconnect failed after %d attempts — giving up", RECONNECT_MAX_ATTEMPTS)
         return False
 
     # ---- tool invocation ----
@@ -235,7 +263,13 @@ class BridgeClient:
     ) -> dict:
         """Send a ``tool_invoke`` to the bridge and await ``tool_result``."""
         if not self._connected or self._ws is None:
-            return fail("BRIDGE_NOT_CONNECTED", f"Bridge not connected (host={self.host}:{self.port})")
+            # On-demand reconnect: if the background reconnect gave up or
+            # never started, try one fresh connect before failing. Cheap
+            # (5s timeout) and recovers when Godot came back between calls.
+            if self._closed:
+                return fail("BRIDGE_NOT_CONNECTED", f"Bridge closed (host={self.host}:{self.port})")
+            if not await self.connect():
+                return fail("BRIDGE_NOT_CONNECTED", f"Bridge not connected (host={self.host}:{self.port})")
         req_id = self._next_id
         self._next_id += 1
         msg = {

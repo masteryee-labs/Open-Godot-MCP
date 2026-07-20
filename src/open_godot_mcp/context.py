@@ -76,8 +76,9 @@ class ServerContext:
         bridge = self.bridge(instance_id)
         if bridge is None:
             return fail("BRIDGE_NOT_CONNECTED", "No Godot instance connected")
-        if not bridge.connected:
-            return fail("BRIDGE_NOT_CONNECTED", "Bridge not connected")
+        # Note: do not early-return on `not bridge.connected` — call_tool
+        # performs an on-demand connect so the bridge recovers when Godot
+        # comes back without requiring an MCP server restart.
         return await bridge.call_tool(tool, action, params, timeout=timeout)
 
     # ---- security ----
