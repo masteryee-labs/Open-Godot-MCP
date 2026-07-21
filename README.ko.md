@@ -218,7 +218,7 @@ pip install open-godot-mcp
 | 입력 맵 | `godot_input_map` | InputMap 관리 |
 | 리소스 | `godot_resource` | 타입 인식 검사 |
 | 애니메이션 | `godot_animation` | 생성, 트랙, 프리셋 |
-| TileMap | `godot_tilemap` | 셀 읽기/쓰기 |
+| TileMapLayer | `godot_tilemap` | 셀 읽기/쓰기 |
 | **게임 제어** | `godot_game` | play/stop/freeze |
 | **클록** | `godot_game_time` | freeze/step/step_until |
 | **입력** | `godot_input` | 키보드/마우스/게임패드/텍스트 |

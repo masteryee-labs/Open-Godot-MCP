@@ -218,7 +218,7 @@ Guide d'installation complet : [Docs/06-Installation/Guide.md](Docs/06-Installat
 | Input Map | `godot_input_map` | Gestion de l'InputMap |
 | Ressource | `godot_resource` | Inspection consciente des types |
 | Animation | `godot_animation` | Créer, pistes, préréglages |
-| TileMap | `godot_tilemap` | Lecture/écriture des cellules |
+| TileMapLayer | `godot_tilemap` | Lecture/écriture des cellules |
 | **Contrôle du jeu** | `godot_game` | play/stop/freeze |
 | **Horloge** | `godot_game_time` | freeze/step/step_until |
 | **Entrée** | `godot_input` | Clavier/souris/manette/texte |

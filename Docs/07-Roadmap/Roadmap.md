@@ -216,7 +216,7 @@
 - [ ] `godot_export`（presets, export, add_preset）
 - [ ] `godot_batch`（execute）
 
-**Phase 3 完成標準**：AI 能設定中斷點、inspect 變數、靜態診斷、效能分析、跑測試、操作動畫/TileMap/資產/匯出。
+**Phase 3 完成標準**：AI 能設定中斷點、inspect 變數、靜態診斷、效能分析、跑測試、操作動畫/TileMapLayer/資產/匯出。
 
 ---
 

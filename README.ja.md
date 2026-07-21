@@ -218,7 +218,7 @@ pip install open-godot-mcp
 | 入力マップ | `godot_input_map` | InputMap 管理 |
 | リソース | `godot_resource` | 型対応検査 |
 | アニメーション | `godot_animation` | 作成、トラック、プリセット |
-| TileMap | `godot_tilemap` | セルの読み書き |
+| TileMapLayer | `godot_tilemap` | セルの読み書き |
 | **ゲーム制御** | `godot_game` | play/stop/freeze |
 | **クロック** | `godot_game_time` | freeze/step/step_until |
 | **入力** | `godot_input` | キーボード/マウス/ゲームパッド/テキスト |

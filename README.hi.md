@@ -218,7 +218,7 @@ pip install open-godot-mcp
 | Input Map | `godot_input_map` | InputMap प्रबंधन |
 | Resource | `godot_resource` | प्रकार-जागरूक निरीक्षण |
 | Animation | `godot_animation` | बनाएँ, ट्रैक, प्रीसेट |
-| TileMap | `godot_tilemap` | सेल पढ़ें/लिखें |
+| TileMapLayer | `godot_tilemap` | सेल पढ़ें/लिखें |
 | **गेम नियंत्रण** | `godot_game` | play/stop/freeze |
 | **घड़ी** | `godot_game_time` | freeze/step/step_until |
 | **इनपुट** | `godot_input` | कीबोर्ड/माउस/गेमपैड/टेक्स्ट |

@@ -218,7 +218,7 @@ pip install open-godot-mcp
 | Input Map | `godot_input_map` | Керування InputMap |
 | Resource | `godot_resource` | Інспекція з урахуванням типів |
 | Animation | `godot_animation` | Створення, доріжки, пресети |
-| TileMap | `godot_tilemap` | Читання/запист комірок |
+| TileMapLayer | `godot_tilemap` | Читання/запист комірок |
 | **Керування грою** | `godot_game` | play/stop/freeze |
 | **Годинник** | `godot_game_time` | freeze/step/step_until |
 | **Ввід** | `godot_input` | Клавіатура/миша/геймпад/текст |

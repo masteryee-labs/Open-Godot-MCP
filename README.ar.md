@@ -218,7 +218,7 @@ pip install open-godot-mcp
 | خريطة الإدخال | `godot_input_map` | إدارة InputMap |
 | المورد | `godot_resource` | فحص حسب النوع |
 | الرسوم المتحركة | `godot_animation` | إنشاء، مسارات، إعدادات مسبقة |
-| TileMap | `godot_tilemap` | قراءة/كتابة الخلايا |
+| TileMapLayer | `godot_tilemap` | قراءة/كتابة الخلايا |
 | **تحكم اللعبة** | `godot_game` | تشغيل/إيقاف/تجميد |
 | **الساعة** | `godot_game_time` | تجميد/خطوة/step_until |
 | **الإدخال** | `godot_input` | لوحة المفاتيح/الفأرة/يد التحكم/نص |

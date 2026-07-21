@@ -218,7 +218,7 @@ Hướng dẫn cài đặt đầy đủ: [Docs/06-Installation/Guide.md](Docs/06
 | Input Map | `godot_input_map` | Quản lý InputMap |
 | Resource | `godot_resource` | Kiểm tra theo kiểu |
 | Animation | `godot_animation` | Tạo, track, preset |
-| TileMap | `godot_tilemap` | Đọc/ghi ô |
+| TileMapLayer | `godot_tilemap` | Đọc/ghi ô |
 | **Điều khiển trò chơi** | `godot_game` | play/stop/freeze |
 | **Đồng hồ** | `godot_game_time` | freeze/step/step_until |
 | **Input** | `godot_input` | Bàn phím/chuột/gamepad/văn bản |

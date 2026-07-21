@@ -218,7 +218,7 @@ pip install open-godot-mcp
 | Input Map | `godot_input_map` | จัดการ InputMap |
 | Resource | `godot_resource` | การตรวจสอบตามชนิด |
 | Animation | `godot_animation` | สร้าง แทร็ก พรีเซ็ต |
-| TileMap | `godot_tilemap` | อ่าน/เขียนเซลล์ |
+| TileMapLayer | `godot_tilemap` | อ่าน/เขียนเซลล์ |
 | **ควบคุมเกม** | `godot_game` | เล่น/หยุด/หยุดนาฬิกา |
 | **นาฬิกา** | `godot_game_time` | หยุด/ก้าน/ก้านจนครบเงื่อนไข |
 | **อินพุต** | `godot_input` | คีย์บอร์ด/เมาส์/เกมแพด/ข้อความ |

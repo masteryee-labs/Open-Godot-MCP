@@ -218,7 +218,7 @@ Tam kurulum kılavuzu: [Docs/06-Installation/Guide.md](Docs/06-Installation/Guid
 | Giriş Haritası | `godot_input_map` | InputMap yönetimi |
 | Kaynak | `godot_resource` | Tür duyarlı inceleme |
 | Animasyon | `godot_animation` | Oluştur, parçalar, ön ayarlar |
-| TileMap | `godot_tilemap` | Hücre oku/yaz |
+| TileMapLayer | `godot_tilemap` | Hücre oku/yaz |
 | **Oyun Kontrolü** | `godot_game` | oynat/durdur/dondur |
 | **Saat** | `godot_game_time` | dondur/adım/step_until |
 | **Giriş** | `godot_input` | Klavye/fare/gamepad/metin |

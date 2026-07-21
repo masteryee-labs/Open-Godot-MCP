@@ -218,7 +218,7 @@ Volledige installatiehandleiding: [Docs/06-Installation/Guide.md](Docs/06-Instal
 | Input Map | `godot_input_map` | InputMap-beheer |
 | Resource | `godot_resource` | Type-bewuste inspectie |
 | Animatie | `godot_animation` | Aanmaken, tracks, presets |
-| TileMap | `godot_tilemap` | Cel lezen/schrijven |
+| TileMapLayer | `godot_tilemap` | Cel lezen/schrijven |
 | **Gamebesturing** | `godot_game` | play/stop/freeze |
 | **Klok** | `godot_game_time` | freeze/step/step_until |
 | **Input** | `godot_input` | Toetsenbord/muis/gamepad/tekst |

@@ -1,4 +1,8 @@
-"""TileMap tools — godot_tilemap (mixed, TileMapLayer/GridMap ops).
+"""TileMapLayer tools — godot_tilemap (mixed, TileMapLayer cell ops).
+
+TileMapLayer is the only supported node from Godot 4.3+.
+TileMap was deprecated in 4.3 and removed in 4.7.
+Legacy TileMap nodes (pre-4.3 projects) are supported via dynamic dispatch.
 
 Docs: 02-Tools/Resource.md §godot_tilemap
   read_cells, set_cell, set_cells, clear
@@ -16,13 +20,5 @@ def register_tilemap_tools(mcp: FastMCP, ctx: ServerContext) -> None:
         mcp,
         ctx,
         "godot_tilemap",
-        "TileMapLayer/GridMap cell operations. node_path is a NODE path (/root/.../TileMapLayer). "
-        "Actions: "
-        "read_cells(node_path,region?) {cells:[{coords:{x,y},source_id,atlas_coords:{x,y}}]} "
-        "(region omitted = all cells; region={x,y,width,height} in grid coords), "
-        "set_cell(node_path,coords,source_id,atlas_coords) write, "
-        "set_cells(node_path,cells:[{coords,source_id,atlas_coords}]) write, "
-        "clear(node_path,region?) write. "
-        "coords={x,y} grid coords (not pixels); source_id is TileSource int ID; "
-        "atlas_coords={x,y} tile coords within atlas.",
+        "TileMapLayer/GridMap cell ops. Actions: read_cells(node_path,region?),set_cell,set_cells,clear. node_path=/root/....",
     )

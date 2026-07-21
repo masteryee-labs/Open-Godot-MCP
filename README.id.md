@@ -218,7 +218,7 @@ Panduan instalasi lengkap: [Docs/06-Installation/Guide.md](Docs/06-Installation/
 | Input Map | `godot_input_map` | Manajemen InputMap |
 | Resource | `godot_resource` | Inspeksi sadar-tipe |
 | Animation | `godot_animation` | Buat, track, preset |
-| TileMap | `godot_tilemap` | Baca/tulis cell |
+| TileMapLayer | `godot_tilemap` | Baca/tulis cell |
 | **Kontrol Game** | `godot_game` | play/stop/freeze |
 | **Clock** | `godot_game_time` | freeze/step/step_until |
 | **Input** | `godot_input` | Keyboard/mouse/gamepad/teks |

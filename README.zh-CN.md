@@ -218,7 +218,7 @@ pip install open-godot-mcp
 | 输入映射 | `godot_input_map` | InputMap 管理 |
 | 资源 | `godot_resource` | 类型感知检查 |
 | 动画 | `godot_animation` | 创建、轨道、预设 |
-| TileMap | `godot_tilemap` | 单元格读写 |
+| TileMapLayer | `godot_tilemap` | 单元格读写 |
 | **游戏控制** | `godot_game` | play/stop/freeze |
 | **时钟** | `godot_game_time` | freeze/step/step_until |
 | **输入** | `godot_input` | 键盘/鼠标/手柄/文本 |

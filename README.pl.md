@@ -218,7 +218,7 @@ Pełny przewodnik instalacji: [Docs/06-Installation/Guide.md](Docs/06-Installati
 | Input Map | `godot_input_map` | Zarządzanie InputMap |
 | Resource | `godot_resource` | Inspekcja z uwzględnieniem typu |
 | Animation | `godot_animation` | Tworzenie, ścieżki, presety |
-| TileMap | `godot_tilemap` | Odczyt/zapis komórek |
+| TileMapLayer | `godot_tilemap` | Odczyt/zapis komórek |
 | **Kontrola gry** | `godot_game` | play/stop/freeze |
 | **Zegar** | `godot_game_time` | freeze/step/step_until |
 | **Input** | `godot_input` | Klawiatura/mysz/pad/tekst |

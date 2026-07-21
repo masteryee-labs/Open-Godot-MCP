@@ -218,7 +218,7 @@ Addon 會自動注入。開啟 AI Client 開始用。
 | 輸入映射 | `godot_input_map` | InputMap 管理 |
 | 資源 | `godot_resource` | 型別感知檢視 |
 | 動畫 | `godot_animation` | 建立、軌道、預設 |
-| TileMap | `godot_tilemap` | cell 讀寫 |
+| TileMapLayer | `godot_tilemap` | cell 讀寫 |
 | **遊戲控制** | `godot_game` | play/stop/freeze |
 | **時鐘** | `godot_game_time` | freeze/step/step_until |
 | **輸入** | `godot_input` | 鍵盤/滑鼠/手把/文字 |

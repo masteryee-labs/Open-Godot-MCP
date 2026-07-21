@@ -38,7 +38,7 @@
 | Navigation | — | nav mesh baking, agent, pathfinding | 中 | ❌ 無 |
 | Particles | — | GPU particles + presets | 低 | ❌ 無 |
 | Audio | — | player, bus effects chain | 低 | ❌ 無 |
-| TileMap | ✅ | — | — | ✅ 有 |
+| TileMapLayer | ✅ | — | — | ✅ 有 |
 | Shader | — | create/edit/assign/params | 中 | ❌ 無 |
 | Theme/UI | — | StyleBoxFlat, color/font overrides | 低 | ❌ 無 |
 | Resource | ✅ | .tres CRUD, autoload | 低 | ⚠️ 有 inspect/list/find |
