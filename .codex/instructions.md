@@ -299,6 +299,25 @@ python3 -m venv "$HOME/.deep-memory/.venv"
 Memory vs. current rules/files conflict → **current rules win**. Log conflict to `.codex/loop_state/<session_id>.md`.
 If the same conflict recurs, update `.agents/knowledge_distill.md` and consider correcting memory.
 
+### Context moat (what survives model + platform absorption)
+
+> Source: romanticamaj's harness-depreciation retrospective (2026). Universal rules, generic workflows, and task-decomposition methods are being absorbed into base models and platform tooling. What survives is the part the model *cannot* learn from the internet and the platform *cannot* ship generically.
+
+A knowledge candidate is **moat-worthy** (worth distilling into `knowledge_distill.md` or cold memory) only if it falls into one of five categories:
+
+| # | Category | Why the model can't absorb it |
+|---|----------|-------------------------------|
+| 1 | **Company-specific data** | Not on the internet. Internal schemas, business rules, domain entities. |
+| 2 | **Customer needs the customer can't articulate clearly** | Requires translation from vague/contradictory requests → executable spec. The translator's judgment is the asset. |
+| 3 | **Product pitfalls actually hit** | Hard-won from production incidents, not from reading. |
+| 4 | **Real user behavior** | How users actually use the product, not how docs say they should. |
+| 5 | **Judgment only you hold: "why this can't be done that way"** | Tacit knowledge from lived context. The model has no training data for *your* specific "don't." |
+
+**Distillation filter:** Before promoting a candidate from `candidate_memory.jsonl` → `knowledge_distill.md`, run it through this list. If it matches none of the five → it is likely *compensation-layer* knowledge (a method, a workflow, a generic rule) that the next model generation or platform update will absorb. Log it to cold memory as `axis: compensation` with a depreciation note, not to the hot knowledge layer. This keeps `knowledge_distill.md` (<8KB) reserved for assets that appreciate rather than depreciate.
+
+**Counter-example (do NOT distill):** "Always decompose long tasks into subtasks before dispatching." → Generic workflow rule. Platforms now build this in. Belongs in canon only as long as the current model can't do it natively; remove when it can (see `HARNESS_ENGINEERING.md` §"Stronger model → bifurcated harness" and REDLINES #18 five-question gate).
+
+
 ## The Memory Keeper worker
 
 When a task reaches high completion, the Commander dispatches the **Memory Keeper** worker
@@ -1320,6 +1339,40 @@ S-tier single commands (<5 lines, 1 file, no verification chain): e.g., updating
 ## SHA discipline (stale evidence trap)
 A subtle trap: an agent writes code, a reviewer says "clean," the agent pushes a fix commit, and you merge using the *old* "clean" verdict on the *new* code. You trusted stale evidence.
 **Rule: review/verification status is only valid for the exact version it was run on.** After any new write, re-verify. Never carry a verdict across versions.
+## Verification anchor tiers (strong vs weak evidence)
+> Source: Carlos E. Perez, "From Loop Engineering to Graph Engineering?" (2026-07-18); arXiv 2306.05685 (LLM-as-judge self-preference); arXiv 2404.13076 (familiarity bias in LLM judges). Distilled 2026-07-20.
+
+Not all verification is equal. A verification method that cannot be gamed by the system it checks is a **strong anchor** ⚓; one that can be gamed, biased, or captured is a **weak anchor** ⚠️. A deploy that only has weak anchors still passes per REDLINES #9, but carries higher residual risk — the verification is probabilistic, not deterministic.
+
+### The tier table
+
+| Tier | What it is | Examples | Can the verified system game it? |
+|------|-----------|----------|----------------------------------|
+| **Strong anchor** ⚓ | Deterministic execution against evidence the verified system cannot see or alter | `verify.py` read-back, real test suite pass/fail, holdout exam set, real money in bank, real customer churn count, human spot-check of real output | No — pass is pass, fail is fail |
+| **Weak anchor** ⚠️ | Probabilistic judgment by an agent (even a fresh-context one), or cross-reference between reports | Fresh-context agent read-back, LLM-as-judge, multi-agent debate, report-to-report consistency check, public benchmark (may be in training data) | Yes — bias, familiarity preference, shared blind spots, data contamination |
+
+### Why LLM-as-judge is weak (not useless, but weak)
+- arXiv 2306.05685: LLM judges score their own writing higher; humans cannot detect the difference. Self-preference grows with model capability.
+- arXiv 2404.13076: The bias mechanism is *familiarity* — models prefer text that "reads like something they would write." Swapping to a different model of similar family/style does not fully remove the bias.
+- Implication: a network of AI agents checking each other (even cross-family) is *better than self-check*, but it is still a weak anchor. **A network of weak anchors is a louder echo chamber, not a strong anchor.** Grounding requires at least one link to reality that no agent in the network can alter.
+
+### Frozen nodes (anchors the optimization loop must never touch)
+Some evidence must be physically unreachable by the agent being verified — the holdout principle:
+- **Test data the agent never sees** (holdout exam set, frozen acceptance criteria written *before* the agent started).
+- **Real-world outcomes** (did the deploy actually sync? did the customer actually pay? did the test actually pass in CI?).
+- **Human judgment** ("is this the right thing to build?" — only a human answers this; see "The honest limit" below).
+
+A frozen node that the agent *can* read is no longer frozen — it will be optimized for. Holdout only works if the agent physically cannot access it.
+
+### Rule
+- **Classify each verification method as strong or weak before relying on it.** "Fresh-context agent verified it" is weak. "verify.py passed" is strong. Know which one you're trusting. The classification is awareness, not a gate — REDLINES #9 remains the authority on what passes a deploy.
+- **Prefer ≥1 strong anchor when available.** `verify.py` or equivalent deterministic check is strictly stronger than fresh-context read-back alone. If both are feasible, use both. If only fresh-context read-back is available (e.g., no `verify.py` for this tool), the deploy still passes per REDLINES #9 — add a note in the verification report's "Uncertain" section that only weak-anchor verification was available, so the human knows the residual risk. Do not change the Verdict field (it stays PASS); the note is informational.
+- **Weak anchors are additive, not substitutive.** Two weak anchors ≠ one strong anchor. They reduce different blind spots but share the same fundamental limitation (probabilistic, gameable).
+- **LLM-as-judge bias is systematic, not random.** Use a different model family than the producer (cross-family debate), but know this only *reduces* the bias — it does not eliminate it. Familiarity bias persists across same-tier models.
+- **Frozen nodes must be physically inaccessible to the verified agent.** A holdout the agent can read = a holdout the agent will overfit to. Enforce at the OS/permission layer, not the prompt layer (see REDLINES §"Mechanical Enforcement").
+- **The "echo chamber" failure mode:** a verification network where every node is an AI agent, checking other AI agents, with no link to deterministic reality. Every node agrees, every node is confident, none of them are grounded. This is the most dangerous verification failure because it *looks* thorough.
+- **At least one anchor should come from outside the agent system when stakes are high.** A human spot-check, a real CI run, a real test execution. "Outside" means the verified system cannot influence it. This is the grounding that no amount of internal cross-checking can substitute.
+
 ## Multi-agent debate (for high-risk)
 For genuinely high-risk judgments (security, architecture, irreversible changes):
 1. Dispatch 2 independent verifiers (different context, ideally different model family).
@@ -2154,9 +2207,23 @@ None of these are "write a better prompt" problems.
 | Safety boundary | Tool permissions, behavior constraints | Red lines, backup-before-overwrite, human-in-loop triggers |
 | Task orchestration | Multi-agent coordination | Commander + Workers, maker≠checker, dispatch three-piece set |
 
-## Stronger model → more important harness (not less)
+## Stronger model → bifurcated harness (two depreciation axes)
 
-Misconception: "model gets stronger → harness less needed." Opposite is true. Stronger models get more autonomy → guardrails must be more precise. Nicholas Carlini's C compiler project: each model capability tier needed a *redesigned* harness. Not less harness — better harness.
+Misconception: "model gets stronger → harness less needed." Opposite is true — but only for one of two harness layers. Split harness into two axes by what they compensate for:
+
+| Axis | What it is | Examples | Model upgrade effect |
+|------|-----------|----------|----------------------|
+| **Deterministic infrastructure** | Code the model physically cannot run: sandbox exec, file I/O, format validation, permission gates, git worktree isolation, `verify.py`, `distill.py` detection/sync | `scripts/*.py`, OS/Account/IAM, tool registry | **Appreciates** — stronger model gets more autonomy → guardrails must be more precise (Ashby's law) |
+| **Capability compensation** | Prompts/skills that patch what the model currently can't do well: caveman comms, BOOT ordering, commander-worker prompts, task-decomposition prompts, orchestration scaffolding | caveman protocol, commander-worker dispatch prompts, REDLINES prompt-style rules | **Depreciates** — model upgrades absorb these into base capability; platform tooling absorbs coordination mechanisms |
+
+Nicholas Carlini's C compiler project: each model capability tier needed a *redesigned* harness — but the redesign *removed* compensation layers the new model no longer needed, while *adding* infrastructure layers the new autonomy demanded. Not "more harness" or "less harness" — **shift left from compensation to infrastructure**.
+
+### Rule (bifurcated depreciation)
+
+- **Classify every harness component: infrastructure or compensation.** Infrastructure appreciates with model strength; compensation depreciates. Mixing them in one bucket produces both over-investment in dying components and under-investment in growing ones.
+- **On model upgrade, audit compensation layers for absorption.** If the model now does X natively, the compensation component for X is obsolete — remove it (see REDLINES §"Harness evolution" assumption expiry). Keeping it = overhead + context rot.
+- **Infrastructure layers are not exempt from review — they need *more* precision, not less.** Stronger model = higher variety = Ashby's law demands more regulator variety. The gap between harnessed and unharnessed *widens* with model strength.
+- **AHD self-application:** `distill.py` / `verify.py` / `worktree.py` / `loop_memory_sync.py` are infrastructure (model can't replace deterministic detection/sync/isolation). Caveman protocol, commander-worker prompts, BOOT ordering are compensation (model upgrades erode them). Plan AHD's roadmap on this split, not on "harness matters."
 
 ## Harness should get thinner, not thicker
 
@@ -2383,6 +2450,7 @@ Attention distribution in long context:
 15. **No modifying `.codex/canon/HANDOFF_LETTER.md`.** Runtime judgment and project spirit go into `.agents/handoff_letter.md`. The canonical `HANDOFF_LETTER.md` is source-only and must not be edited by runtime scripts or sessions.
 16. **No explanatory comments in generated code.** AI-generated code must not contain comments that restate what the code already says (`# loop through items`, `// increment counter`). Comments are debt, not documentation. The only permitted comments: (a) API contracts / public-interface docs, (b) non-obvious invariants the reader cannot derive from the code, (c) `TODO`/`FIXME` with an owner or issue ref, (d) language directives (`//go:generate`, `# type: ignore`). Restating-the-code comments = slop. Source: arXiv 2605.02741 (Volume-Quality Inverse Law — comment bloat predicts structural decay); arXiv 2512.20334 (Comment Traps — commented-out/defective comments propagate defects at up to 58%). When the user asks for teaching mode, this red line relaxes for that session only.
 17. **No in-file version stacking.** Do not accumulate version markers, changelog blocks, or `<!-- updated YYYY-MM-DD -->` / `# v2 fixed X` / `# v3` lines inside source files. Version truth = git history + a single append-only `CHANGELOG.md` (one entry per release, not per edit). In-file stacking is context rot (arXiv 2606.09090) and recursive-depth debt. `scripts/sync.py --canon` rejects canon files with stacked version markers in the header. If you must record a change, write one line to `CHANGELOG.md` or rely on the git commit. Never edit a version marker inside the file body.
+18. **No new canon/skill without passing the five-question existence gate.** Before adding any canon file, skill, workflow, or orchestration component, answer all five in writing (to `.codex/loop_state/<session_id>.md` or the proposing doc): (1) *Which model gap does this compensate for?* (2) *After the next model upgrade, what remains?* (3) *After platform tooling absorbs this coordination mechanism, is it still needed?* (4) *Does an existing external solution already do this — and is there a competitive edge?* (5) *Remove this component entirely — what am I left with?* If any answer is "nothing" or "I don't know," do not build it. This gate exists because harness components on the *compensation* axis depreciate per model generation (see `HARNESS_ENGINEERING.md` §"Stronger model → bifurcated harness"); building without the gate = investing in a dying asset. Components on the *deterministic infrastructure* axis (sandbox, sync, verify, isolation) bypass this gate only if they implement something the model physically cannot do.
 
 ## Mechanical Enforcement
 

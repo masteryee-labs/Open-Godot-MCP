@@ -45,6 +45,40 @@ S-tier single commands (<5 lines, 1 file, no verification chain): e.g., updating
 ## SHA discipline (stale evidence trap)
 A subtle trap: an agent writes code, a reviewer says "clean," the agent pushes a fix commit, and you merge using the *old* "clean" verdict on the *new* code. You trusted stale evidence.
 **Rule: review/verification status is only valid for the exact version it was run on.** After any new write, re-verify. Never carry a verdict across versions.
+## Verification anchor tiers (strong vs weak evidence)
+> Source: Carlos E. Perez, "From Loop Engineering to Graph Engineering?" (2026-07-18); arXiv 2306.05685 (LLM-as-judge self-preference); arXiv 2404.13076 (familiarity bias in LLM judges). Distilled 2026-07-20.
+
+Not all verification is equal. A verification method that cannot be gamed by the system it checks is a **strong anchor** ⚓; one that can be gamed, biased, or captured is a **weak anchor** ⚠️. A deploy that only has weak anchors still passes per REDLINES #9, but carries higher residual risk — the verification is probabilistic, not deterministic.
+
+### The tier table
+
+| Tier | What it is | Examples | Can the verified system game it? |
+|------|-----------|----------|----------------------------------|
+| **Strong anchor** ⚓ | Deterministic execution against evidence the verified system cannot see or alter | `verify.py` read-back, real test suite pass/fail, holdout exam set, real money in bank, real customer churn count, human spot-check of real output | No — pass is pass, fail is fail |
+| **Weak anchor** ⚠️ | Probabilistic judgment by an agent (even a fresh-context one), or cross-reference between reports | Fresh-context agent read-back, LLM-as-judge, multi-agent debate, report-to-report consistency check, public benchmark (may be in training data) | Yes — bias, familiarity preference, shared blind spots, data contamination |
+
+### Why LLM-as-judge is weak (not useless, but weak)
+- arXiv 2306.05685: LLM judges score their own writing higher; humans cannot detect the difference. Self-preference grows with model capability.
+- arXiv 2404.13076: The bias mechanism is *familiarity* — models prefer text that "reads like something they would write." Swapping to a different model of similar family/style does not fully remove the bias.
+- Implication: a network of AI agents checking each other (even cross-family) is *better than self-check*, but it is still a weak anchor. **A network of weak anchors is a louder echo chamber, not a strong anchor.** Grounding requires at least one link to reality that no agent in the network can alter.
+
+### Frozen nodes (anchors the optimization loop must never touch)
+Some evidence must be physically unreachable by the agent being verified — the holdout principle:
+- **Test data the agent never sees** (holdout exam set, frozen acceptance criteria written *before* the agent started).
+- **Real-world outcomes** (did the deploy actually sync? did the customer actually pay? did the test actually pass in CI?).
+- **Human judgment** ("is this the right thing to build?" — only a human answers this; see "The honest limit" below).
+
+A frozen node that the agent *can* read is no longer frozen — it will be optimized for. Holdout only works if the agent physically cannot access it.
+
+### Rule
+- **Classify each verification method as strong or weak before relying on it.** "Fresh-context agent verified it" is weak. "verify.py passed" is strong. Know which one you're trusting. The classification is awareness, not a gate — REDLINES #9 remains the authority on what passes a deploy.
+- **Prefer ≥1 strong anchor when available.** `verify.py` or equivalent deterministic check is strictly stronger than fresh-context read-back alone. If both are feasible, use both. If only fresh-context read-back is available (e.g., no `verify.py` for this tool), the deploy still passes per REDLINES #9 — add a note in the verification report's "Uncertain" section that only weak-anchor verification was available, so the human knows the residual risk. Do not change the Verdict field (it stays PASS); the note is informational.
+- **Weak anchors are additive, not substitutive.** Two weak anchors ≠ one strong anchor. They reduce different blind spots but share the same fundamental limitation (probabilistic, gameable).
+- **LLM-as-judge bias is systematic, not random.** Use a different model family than the producer (cross-family debate), but know this only *reduces* the bias — it does not eliminate it. Familiarity bias persists across same-tier models.
+- **Frozen nodes must be physically inaccessible to the verified agent.** A holdout the agent can read = a holdout the agent will overfit to. Enforce at the OS/permission layer, not the prompt layer (see REDLINES §"Mechanical Enforcement").
+- **The "echo chamber" failure mode:** a verification network where every node is an AI agent, checking other AI agents, with no link to deterministic reality. Every node agrees, every node is confident, none of them are grounded. This is the most dangerous verification failure because it *looks* thorough.
+- **At least one anchor should come from outside the agent system when stakes are high.** A human spot-check, a real CI run, a real test execution. "Outside" means the verified system cannot influence it. This is the grounding that no amount of internal cross-checking can substitute.
+
 ## Multi-agent debate (for high-risk)
 For genuinely high-risk judgments (security, architecture, irreversible changes):
 1. Dispatch 2 independent verifiers (different context, ideally different model family).

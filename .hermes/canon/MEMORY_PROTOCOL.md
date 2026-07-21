@@ -80,6 +80,25 @@ python3 -m venv "$HOME/.deep-memory/.venv"
 Memory vs. current rules/files conflict → **current rules win**. Log conflict to `.hermes/loop_state/<session_id>.md`.
 If the same conflict recurs, update `.agents/knowledge_distill.md` and consider correcting memory.
 
+### Context moat (what survives model + platform absorption)
+
+> Source: romanticamaj's harness-depreciation retrospective (2026). Universal rules, generic workflows, and task-decomposition methods are being absorbed into base models and platform tooling. What survives is the part the model *cannot* learn from the internet and the platform *cannot* ship generically.
+
+A knowledge candidate is **moat-worthy** (worth distilling into `knowledge_distill.md` or cold memory) only if it falls into one of five categories:
+
+| # | Category | Why the model can't absorb it |
+|---|----------|-------------------------------|
+| 1 | **Company-specific data** | Not on the internet. Internal schemas, business rules, domain entities. |
+| 2 | **Customer needs the customer can't articulate clearly** | Requires translation from vague/contradictory requests → executable spec. The translator's judgment is the asset. |
+| 3 | **Product pitfalls actually hit** | Hard-won from production incidents, not from reading. |
+| 4 | **Real user behavior** | How users actually use the product, not how docs say they should. |
+| 5 | **Judgment only you hold: "why this can't be done that way"** | Tacit knowledge from lived context. The model has no training data for *your* specific "don't." |
+
+**Distillation filter:** Before promoting a candidate from `candidate_memory.jsonl` → `knowledge_distill.md`, run it through this list. If it matches none of the five → it is likely *compensation-layer* knowledge (a method, a workflow, a generic rule) that the next model generation or platform update will absorb. Log it to cold memory as `axis: compensation` with a depreciation note, not to the hot knowledge layer. This keeps `knowledge_distill.md` (<8KB) reserved for assets that appreciate rather than depreciate.
+
+**Counter-example (do NOT distill):** "Always decompose long tasks into subtasks before dispatching." → Generic workflow rule. Platforms now build this in. Belongs in canon only as long as the current model can't do it natively; remove when it can (see `HARNESS_ENGINEERING.md` §"Stronger model → bifurcated harness" and REDLINES #18 five-question gate).
+
+
 ## The Memory Keeper worker
 
 When a task reaches high completion, the Commander dispatches the **Memory Keeper** worker

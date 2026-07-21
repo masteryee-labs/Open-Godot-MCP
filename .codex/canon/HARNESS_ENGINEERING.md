@@ -39,9 +39,23 @@ None of these are "write a better prompt" problems.
 | Safety boundary | Tool permissions, behavior constraints | Red lines, backup-before-overwrite, human-in-loop triggers |
 | Task orchestration | Multi-agent coordination | Commander + Workers, maker≠checker, dispatch three-piece set |
 
-## Stronger model → more important harness (not less)
+## Stronger model → bifurcated harness (two depreciation axes)
 
-Misconception: "model gets stronger → harness less needed." Opposite is true. Stronger models get more autonomy → guardrails must be more precise. Nicholas Carlini's C compiler project: each model capability tier needed a *redesigned* harness. Not less harness — better harness.
+Misconception: "model gets stronger → harness less needed." Opposite is true — but only for one of two harness layers. Split harness into two axes by what they compensate for:
+
+| Axis | What it is | Examples | Model upgrade effect |
+|------|-----------|----------|----------------------|
+| **Deterministic infrastructure** | Code the model physically cannot run: sandbox exec, file I/O, format validation, permission gates, git worktree isolation, `verify.py`, `distill.py` detection/sync | `scripts/*.py`, OS/Account/IAM, tool registry | **Appreciates** — stronger model gets more autonomy → guardrails must be more precise (Ashby's law) |
+| **Capability compensation** | Prompts/skills that patch what the model currently can't do well: caveman comms, BOOT ordering, commander-worker prompts, task-decomposition prompts, orchestration scaffolding | caveman protocol, commander-worker dispatch prompts, REDLINES prompt-style rules | **Depreciates** — model upgrades absorb these into base capability; platform tooling absorbs coordination mechanisms |
+
+Nicholas Carlini's C compiler project: each model capability tier needed a *redesigned* harness — but the redesign *removed* compensation layers the new model no longer needed, while *adding* infrastructure layers the new autonomy demanded. Not "more harness" or "less harness" — **shift left from compensation to infrastructure**.
+
+### Rule (bifurcated depreciation)
+
+- **Classify every harness component: infrastructure or compensation.** Infrastructure appreciates with model strength; compensation depreciates. Mixing them in one bucket produces both over-investment in dying components and under-investment in growing ones.
+- **On model upgrade, audit compensation layers for absorption.** If the model now does X natively, the compensation component for X is obsolete — remove it (see REDLINES §"Harness evolution" assumption expiry). Keeping it = overhead + context rot.
+- **Infrastructure layers are not exempt from review — they need *more* precision, not less.** Stronger model = higher variety = Ashby's law demands more regulator variety. The gap between harnessed and unharnessed *widens* with model strength.
+- **AHD self-application:** `distill.py` / `verify.py` / `worktree.py` / `loop_memory_sync.py` are infrastructure (model can't replace deterministic detection/sync/isolation). Caveman protocol, commander-worker prompts, BOOT ordering are compensation (model upgrades erode them). Plan AHD's roadmap on this split, not on "harness matters."
 
 ## Harness should get thinner, not thicker
 
