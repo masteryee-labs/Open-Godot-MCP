@@ -1,4 +1,4 @@
-"""Test server builds with all 30 tools registered."""
+"""Test server builds with all 31 tools registered."""
 
 import asyncio
 
@@ -12,7 +12,7 @@ def test_server_builds():
     assert mcp is not None
 
 
-def test_all_30_tools_registered():
+def test_all_31_tools_registered():
     ctx = ServerContext()
     mcp = build_mcp(ctx)
     tools = asyncio.run(mcp.list_tools())
@@ -28,6 +28,7 @@ def test_all_30_tools_registered():
         "godot_test", "godot_network", "godot_instance",
         "godot_filesystem", "godot_docs", "godot_log",
         "godot_batch", "godot_asset", "godot_export", "godot_health",
+        "godot_csharp_check",
     }
     assert tool_names == expected, f"Missing: {expected - tool_names}, Extra: {tool_names - expected}"
 
@@ -36,5 +37,4 @@ def test_read_only_mode_blocks_writes():
     ctx = ServerContext(read_only=True)
     mcp = build_mcp(ctx)
     tools = asyncio.run(mcp.list_tools())
-    # Verify the server built without error in read-only mode
-    assert len(tools) == 30
+    assert len(tools) == 31

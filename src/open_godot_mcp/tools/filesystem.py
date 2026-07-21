@@ -64,26 +64,14 @@ def register_filesystem_tools(mcp: FastMCP, ctx: ServerContext) -> None:
         mcp,
         ctx,
         "godot_filesystem",
-        "File ops. Actions: "
-        "list(path,include_hidden?) {entries:[{name,type,size?}]}, "
-        "read(path,start_line?,end_line?,max_bytes?) {content,total_lines} "
-        "(TEXT files only; binary -> UNSUPPORTED_FILE_TYPE; 1-based lines), "
-        "search(query,glob?,max_results?) {matches:[{path,line,line_number,match_text}]} "
-        "(query is Python re regex), "
-        "create(path,content) write, "
-        "delete(path,confirm?) write (dangerous paths need confirm=true), "
-        "rename(old_path,new_path) write. "
-        "path accepts res:// or absolute filesystem path.",
+        "File ops. Actions: list,read,search,create,delete,rename. path=res:// or absolute.",
     )
 
     @make_tool(
         mcp,
         ctx,
         "godot_docs",
-        "Godot official docs (version-matched, auto-allow). Actions: "
-        "fetch(class_name,method?) {markdown,url} "
-        "(fetches the live Godot docs page, converts to markdown), "
-        "search(query) {results:[{title,url,snippet}]}.",
+        "Godot official docs (version-matched). Actions: fetch(class_name,method?),search(query).",
     )
     async def godot_docs(action: str, params: dict | None = None) -> dict:
         params = params or {}
@@ -146,9 +134,5 @@ def register_filesystem_tools(mcp: FastMCP, ctx: ServerContext) -> None:
         mcp,
         ctx,
         "godot_log",
-        "Log access. Actions: "
-        "get(source?=editor|game|plugin|all,count?,offset?,since_ms?) "
-        "{entries:[{time,level,source,message}]} (auto-allow), "
-        "errors(max?,include_warnings?) {errors:[...]} (auto-allow), "
-        "clear (write, gated).",
+        "Log access. Actions: get(source?,count?,offset?,since_ms?),errors(max?,include_warnings?),clear.",
     )

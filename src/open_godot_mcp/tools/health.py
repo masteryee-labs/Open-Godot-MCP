@@ -16,8 +16,5 @@ def register_health_tools(mcp: FastMCP, ctx: ServerContext) -> None:
         mcp,
         ctx,
         "godot_health",
-        "Connection health (auto-allow). Actions: "
-        "check {bridge_connected,runtime_connected,server_version,addon_version,latency_ms}, "
-        "diagnostics {port,conflicts,warnings:[str]}. "
-        "Call this first to verify connectivity.",
+        "Connection health. Actions: check,diagnostics. Call first to verify connectivity.",
     )

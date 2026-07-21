@@ -31,19 +31,7 @@ def register_network_tools(mcp: FastMCP, ctx: ServerContext) -> None:
         mcp,
         ctx,
         "godot_network",
-        "Multiplayer game testing (Open Godot MCP unique feature). Manages GAME "
-        "instances (not editor instances — use godot_instance for those). Actions: "
-        "launch_instance(role='host'|'client',scene?,args?) -> {instance_id,game_port} "
-        "(host: scene=res://... to load; client: args={connect_to:'ip:port',reconnect?}), "
-        "list_instances {instances:[{instance_id,role,connected,game_port,player_count?}]}, "
-        "switch(instance_id) write, terminate(instance_id) write, "
-        "simulate_peer(instance_id,peer_config) write "
-        "(peer_config={peer_id:int,player_name?,...}; simulates in host process), "
-        "network_condition(instance_id,latency_ms?,loss_pct?,jitter_ms?) write "
-        "(loss_pct 0-100 float), "
-        "sync_state(instances?) {all_in_sync,sync:[{instance_id,node_path,properties,in_sync}]} "
-        "(compares mcp_watch nodes across instances), "
-        "rpc_call(instance_id,node_path,method,args?) -> {result} (call @rpc method).",
+        "Multiplayer game testing. Actions: launch_instance(role,scene?,args?),list_instances,switch,terminate,simulate_peer,network_condition,sync_state,rpc_call.",
     )
     async def godot_network(action: str, params: dict | None = None) -> dict:
         params = params or {}

@@ -16,26 +16,5 @@ def register_animation_tools(mcp: FastMCP, ctx: ServerContext) -> None:
         mcp,
         ctx,
         "godot_animation",
-        "AnimationPlayer operations. player_path is a NODE path (/root/.../AnimationPlayer). "
-        "Actions: "
-        "list(player_path) {animations:[str]}, "
-        "get(player_path,name) {tracks,length,loop}, "
-        "create(player_path,name,length,loop?) write (length in seconds), "
-        "add_track(player_path,anim,track_type,path,keyframes) write "
-        "(track_type: value|transform|bezier|method|audio|animation; "
-        "path is relative to AnimationPlayer's parent: 'Node:property' "
-        "(transform tracks: just 'Node' no :property); "
-        "keyframes: all time values in SECONDS; "
-        "value:[{time,value}], transform:[{time,position,rotation_deg,scale}], "
-        "bezier:[{time,value,in_handle,out_handle}], "
-        "method:[{time,method,args}], audio:[{time,stream_path,start_offset,end_offset}], "
-        "animation:[{time,animation}]), "
-        "delete(player_path,name) write, "
-        "play(player_path,name) write (EDITOR PREVIEW only; for runtime use godot_exec call), "
-        "stop(player_path) write, "
-        "preset(player_path,anim,preset,target) write "
-        "(preset: fade|slide|shake|pulse; target relative to AnimationPlayer parent "
-        "like 'Player/Sprite2D' NOT /root/...; "
-        "fade=modulate:a 1->0->1, slide=position +50px->back, "
-        "shake=position random 5px 0.3s, pulse=scale 1->1.2->1).",
+        "AnimationPlayer ops. Actions: list,get,create,add_track,delete,play,stop,preset. player_path=/root/.../AnimationPlayer.",
     )

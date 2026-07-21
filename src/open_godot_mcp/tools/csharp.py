@@ -16,9 +16,5 @@ def register_csharp_tools(mcp: FastMCP, ctx: ServerContext) -> None:
         mcp,
         ctx,
         "godot_csharp_check",
-        "C# compile/syntax check (read-only). Actions: "
-        "info {is_dotnet,csproj,dotnet_available,dotnet_version} — check if project is .NET, "
-        "build(project?) {ok,errors:[{file,line,col,code,message}],warnings,exit_code} — run dotnet build, "
-        "syntax(source?/path?) {ok,errors:[{line,col,code,message}]} — basic syntax check (brace balance, GDScript-in-C# detection), "
-        "use 'build' for full compile check via dotnet build.",
+        "C# compile/syntax check. Actions: info,build(project?),syntax(source?/path?).",
     )

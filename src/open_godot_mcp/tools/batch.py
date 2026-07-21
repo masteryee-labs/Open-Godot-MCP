@@ -19,16 +19,7 @@ def register_batch_tools(mcp: FastMCP, ctx: ServerContext) -> None:
         mcp,
         ctx,
         "godot_batch",
-        "Batch-execute multiple tool calls in one round-trip (gated, single confirmation). "
-        "Action: execute(operations:[{tool,action,params}]) -> {results:[{ok,...}]}. "
-        "results[i] corresponds to operations[i]. "
-        "Each result: {ok:true,...tool_return} or {ok:false,error:{code,message}}. "
-        "Failures do NOT stop subsequent ops (not atomic rollback). "
-        "NO nesting: tool cannot be 'godot_batch'. "
-        "Mixed read+write allowed; one confirmation covers all. "
-        "Saves tokens: build 10 nodes in 1 call instead of 10. "
-        "params is a dict: {\"operations\": [{\"tool\": \"godot_node_edit\", "
-        "\"action\": \"create\", \"params\": {...}}, ...]}.",
+        "Batch-execute multiple tool calls in one round-trip (gated). Action: execute(operations:[{tool,action,params}]). No nesting.",
         is_write=True,
     )
     async def godot_batch(action: str, params: dict | None = None) -> dict:

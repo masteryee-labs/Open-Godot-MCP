@@ -17,20 +17,7 @@ def register_exec_tools(mcp: FastMCP, ctx: ServerContext) -> None:
         mcp,
         ctx,
         "godot_exec",
-        "Execute GDScript in the running game (gated, security-sensitive). Actions: "
-        "eval(code,await?) -> {result,error?} (result is last expression value; "
-        "await=true if code contains 'await' keyword; "
-        "eval context: self=get_tree().root, autoloads accessible by name, "
-        "get_tree()/Engine globals available). "
-        "call(node_path,method,args?) -> {result} (call method on a node; "
-        "args is JSON array with Godot-type encoding). "
-        "assert(condition,description?,await?) -> {condition,passed,time_ms} "
-        "(evaluate GDScript bool expression in game context; returns ASSERT_FAILED if false). "
-        "Use for test setup: grant weapon, skip to wave, spawn bot. "
-        "Use assert for playtest verification: assert 'Player.health > 0'. "
-        "DISABLED if server started with --no-eval (PERMISSION_DENIED). "
-        "C# Godot: eval not supported (C# is compiled); use call instead. "
-        "params is a dict: e.g. {\"code\": \"Player.health = 100\", \"await\": false}.",
+        "Execute GDScript in running game (gated). Actions: eval(code,await?),call(node_path,method,args?),assert(condition,description?,await?). Disabled if --no-eval.",
         is_write=True,
     )
     async def godot_exec(action: str, params: dict | None = None) -> dict:

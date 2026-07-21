@@ -17,20 +17,12 @@ def register_editor_tools(mcp: FastMCP, ctx: ServerContext) -> None:
         mcp,
         ctx,
         "godot_editor_read",
-        "Read-only editor state (auto-allow). Actions: "
-        "state {godot_version,current_scene,is_playing,project_path}, "
-        "selection {nodes:[{path,type,name}]}, "
-        "open_scenes {scenes:[res://...]}, "
-        "viewport(viewport='2d'|'3d') {size:{width,height},transform}, "
-        "performance {fps,memory,draw_calls,object_count}.",
+        "Read-only editor state. Actions: state,selection,open_scenes,viewport,performance.",
     )
     make_simple_tool(
         mcp,
         ctx,
         "godot_editor_edit",
-        "Write to editor (gated, Undo/Redo). Actions: "
-        "open_scene(path=res://...), save_scene(path?=res://...), save_all, "
-        "set_selection(node_paths=[/root/...]), focus_node(node_path=/root/...), "
-        "quit(save=bool).",
+        "Write to editor (gated, Undo/Redo). Actions: open_scene,save_scene,save_all,set_selection,focus_node,quit.",
         is_write=True,
     )

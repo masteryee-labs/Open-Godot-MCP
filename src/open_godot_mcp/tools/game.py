@@ -18,12 +18,5 @@ def register_game_tools(mcp: FastMCP, ctx: ServerContext) -> None:
         mcp,
         ctx,
         "godot_game",
-        "Game lifecycle. Actions: "
-        "play(scene?,frozen?) write -> {ok,runtime_ready} "
-        "(scene: omit=current editor scene, 'main'=project main, or res://...; "
-        "frozen=true starts with Engine.time_scale=0 for deterministic playtesting), "
-        "stop write, pause write (get_tree().paused=true), resume write, "
-        "status(read) {is_playing,runtime_connected,fps,viewport_size?}. "
-        "pause != freeze: pause uses Godot pause system, freeze sets time_scale=0. "
-        "resume does NOT unfreeze; use godot_game_time unfreeze for that.",
+        "Game lifecycle. Actions: play(scene?,frozen?),stop,pause,resume,status.",
     )

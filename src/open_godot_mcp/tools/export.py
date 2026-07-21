@@ -39,15 +39,7 @@ def register_export_tools(mcp: FastMCP, ctx: ServerContext) -> None:
         mcp,
         ctx,
         "godot_export",
-        "Game export. Runtime autoload is auto-stripped on export. Actions: "
-        "presets(read) {presets:[{name,platform,path?}]}, "
-        "export(preset,dest_path) write -> {ok,path,size} "
-        "(preset name from presets(); dest_path is filesystem path; "
-        "AI must add platform extension: Windows=.exe, Linux=.x86_64, "
-        "macOS=.zip, Web=.zip), "
-        "add_preset(name,platform,settings) write "
-        "(platform: windows|linux|macos|android|web; "
-        "settings dict like {binary_format:true,export_debug:false,include_filter:'*.gd'}).",
+        "Game export. Actions: presets,export(preset,dest_path),add_preset(name,platform,settings).",
     )
     async def godot_export(action: str, params: dict | None = None) -> dict:
         params = params or {}

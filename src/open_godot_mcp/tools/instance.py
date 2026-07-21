@@ -17,16 +17,7 @@ def register_instance_tools(mcp: FastMCP, ctx: ServerContext) -> None:
         mcp,
         ctx,
         "godot_instance",
-        "Manage Godot EDITOR instances (not game instances — use godot_network for those). "
-        "Actions: "
-        "launch_editor(project_path) write -> {instance_id,ports:{bridge,dap,lsp}} "
-        "(project_path is absolute filesystem path with project.godot), "
-        "list {instances:[{instance_id,project_path,ports,active}]}, "
-        "switch(instance_id) write, terminate(instance_id) write, "
-        "adopt(project_path) write -> {ok,instance_id,ports} "
-        "(connect to an already-running Godot editor with the addon enabled). "
-        "Each instance gets port block: bridge=6970+10n, dap=6006+10n, lsp=6005+10n. "
-        "params is a dict: e.g. {\"project_path\": \"C:/Users/me/my_game\"}.",
+        "Manage Godot EDITOR instances. Actions: launch_editor(project_path),list,switch,terminate,adopt(project_path).",
         is_write=True,
     )
     async def godot_instance(action: str, params: dict | None = None) -> dict:
