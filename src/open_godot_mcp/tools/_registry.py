@@ -74,3 +74,9 @@ def register_all_tools(mcp: FastMCP, ctx: ServerContext) -> None:
     register_export_tools(mcp, ctx)
     register_batch_tools(mcp, ctx)
     register_csharp_tools(mcp, ctx)
+
+    # Phase 4 — Agnes/NVIDIA API tools (dynamically registered from user config).
+    # Tools only appear if the user enabled them in the dock; otherwise the AI
+    # client never sees them (prevents accidental use of lower-tier vision).
+    ctx._mcp = mcp
+    ctx.sync_agnes_tools()

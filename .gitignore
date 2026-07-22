@@ -8,14 +8,30 @@ __pycache__/
 .venv/
 venv/
 
+# Agent Harness Deploy (AHD) — personal AI tooling configs, not part of the open-source product
+.agents/
+.devin/
+.codex/
+.hermes/
+.windsurf/
+AGENTS.md
+*.ahd_managed
+.agents/qa_fix/
+
+# Internal planning docs (not for contributors)
+plans/
+
 # Test / temp artifacts
 *.bak
 *.bak.*
-*.ahd_managed
-.agents/qa_fix/
 detect_out.txt
 sync_out.txt
 verify_out.txt
+
+# Secrets — API keys must never be committed
+**/config.json
+**/api_keys.json
+**/nvidia_api_keys.json
 
 # OS
 .DS_Store

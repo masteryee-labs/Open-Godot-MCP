@@ -33,6 +33,11 @@ class ServerContext:
     _adopt_host: str = "127.0.0.1"
     _adopt_port: int | None = None
     _adopted: bool = False
+    # Agnes/NVIDIA API: tools are dynamically registered based on this config.
+    # _mcp holds the FastMCP instance so we can add/remove tools on hot-reload.
+    # _registered_agnes_tools tracks what's currently registered so we can diff.
+    _mcp: object = None
+    _registered_agnes_tools: set = field(default_factory=set)
 
     # ---- routing ----
 
@@ -73,6 +78,13 @@ class ServerContext:
                     )
                 except Exception as exc:
                     log.warning("adopt-by-port failed: %s", exc)
+            # Register the agnes_config_changed event handler on the new bridge
+            # so dock hot-reload triggers tool re-sync. Idempotent: on_event
+            # appends, but we only register once per bridge object.
+            bridge = self.instance_manager.get_bridge()
+            if bridge is not None and not getattr(bridge, "_agnes_handler_registered", False):
+                bridge.on_event("agnes_config_changed", self.on_agnes_config_event)
+                bridge._agnes_handler_registered = True
         bridge = self.bridge(instance_id)
         if bridge is None:
             return fail("BRIDGE_NOT_CONNECTED", "No Godot instance connected")
@@ -109,3 +121,53 @@ class ServerContext:
             except ValueError:
                 continue
         return fail("PERMISSION_DENIED", f"Path {path} is outside allowed paths")
+
+    # ---- Agnes/NVIDIA dynamic tool registration ----
+
+    def on_agnes_config_event(self, _params: dict | None = None) -> None:
+        """Bridge event handler: config file changed on disk → re-sync tools."""
+        log.info("agnes_config_changed event received — re-syncing tools")
+        self.sync_agnes_tools()
+
+    def sync_agnes_tools(self) -> None:
+        """Register/unregister agnes_*/nvidia_* tools to match config on disk.
+
+        Called at server build time and on hot-reload events from the dock.
+        Reads the config file fresh each call. No-op if _mcp is not set.
+        """
+        if self._mcp is None:
+            return
+        from .agnes_config import all_enabled_tools, load_config
+
+        cfg = load_config()
+        desired = set(all_enabled_tools(cfg))
+        current = set(self._registered_agnes_tools)
+        # Remove tools that are no longer enabled.
+        for name in current - desired:
+            try:
+                # FastMCP 3.x: remove_tool moved to local_provider (top-level
+                # mcp.remove_tool is deprecated). Try new API first, fall back.
+                remover = getattr(self._mcp, "local_provider", self._mcp)
+                remover.remove_tool(name)
+            except Exception as e:  # noqa: BLE001
+                log.warning("remove_tool %s failed: %s", name, e)
+        # Add tools that are newly enabled.
+        for name in desired - current:
+            try:
+                _register_single_agnes_tool(self._mcp, self, name)
+            except Exception as e:  # noqa: BLE001
+                log.warning("register %s failed: %s", name, e)
+        self._registered_agnes_tools = desired
+
+
+def _register_single_agnes_tool(mcp, ctx, name: str) -> None:
+    """Register one agnes_*/nvidia_* tool by name. Imports lazily to avoid cycles."""
+    from .tools.agnes import register_agnes_tools
+    from .tools.nvidia import register_nvidia_tools
+
+    if name.startswith("agnes_"):
+        register_agnes_tools(mcp, ctx, only={name})
+    elif name.startswith("nvidia_"):
+        register_nvidia_tools(mcp, ctx, only={name})
+    else:
+        log.warning("unknown agnes/nvidia tool name: %s", name)

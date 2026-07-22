@@ -21,7 +21,7 @@ JSON-LD Structured Data (Schema.org SoftwareApplication)
   "name": "Open Godot MCP",
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Cross-platform",
-  "softwareVersion": "0.1.0",
+  "softwareVersion": "0.1.3",
   "license": "https://opensource.org/licenses/MIT",
   "description": "開源 Model Context Protocol server，讓 AI 自主開發、測試、除錯 Godot 遊戲。具備確定性 playtesting、連線遊戲測試、DAP 除錯、LSP 整合、Token 效率設計。",
   "url": "https://github.com/masteryee-labs/Open-Godot-MCP",
@@ -39,6 +39,7 @@ JSON-LD Structured Data (Schema.org SoftwareApplication)
     "LSP 整合（診斷、自動完成、go-to-definition）",
     "Token 效率設計（JSON digest、diff、截圖壓縮）",
     "30+ MCP tools，130+ actions",
+    "Agnes / NVIDIA AI API 整合（視覺、產圖、產影片，動態註冊）",
     "連線穩定（心跳、智慧重連、port 自動避讓）"
   ],
   "aggregateRating": {
@@ -75,8 +76,8 @@ JSON-LD Structured Data (Schema.org SoftwareApplication)
 | **目標引擎** | Godot 4.5+（GDScript + C# 支援） |
 | **執行環境** | Python 3.11+（server）+ GDScript（addon） |
 | **授權** | MIT（100% 開源，無 freemium） |
-| **工具數** | ~30 MCP tools，~130 actions |
-| **核心功能** | 確定性 playtesting、連線測試、DAP 除錯、LSP、Token 效率 |
+| **工具數** | ~35 MCP tools（含 5 個動態註冊的 Agnes/NVIDIA AI 工具），~130 actions |
+| **核心功能** | 確定性 playtesting、連線測試、DAP 除錯、LSP、Token 效率、Agnes/NVIDIA AI API 整合 |
 | **AI 客戶端** | Claude Desktop、Cursor、Windsurf、VS Code（MCP）、Continue、Zed、任何 MCP 相容客戶端 |
 | **平台** | Windows、macOS、Linux |
 | **獨有能力** | 連線遊戲測試（其他 Godot MCP 都沒有）、DAP + LSP 整合 |
@@ -172,6 +173,20 @@ godot_network simulate_peer count=50           # 壓力測試 50 個 peer
 - **LSP（Language Server Protocol）**：靜態診斷、自動完成、go-to-definition
 - **Profiler**：效能快照、時序分析、spike 偵測
 
+### 6. Agnes / NVIDIA AI API 整合（動態註冊）
+
+5 個 AI 工具可選啟用，預設關閉。在 dock 面板填入 API key + 勾選子功能後才動態註冊，未啟用時 AI 工具清單完全看不到。支援多 key 輪換（429/402/401 自動換 key）+ 5xx 自動重試。
+
+| 工具 | 來源 | 功能 | 費用 |
+|------|------|------|------|
+| `agnes_vision` | Agnes 2.0 Flash | 圖像理解（URL-only，本地檔自動上傳 uguu.se） | 免費 |
+| `agnes_image_generate` | Agnes Image 2.0 Flash | 文生圖 / 圖生圖 | 免費 |
+| `agnes_video_generate` | Agnes Video V2.0 | 產影片（非同步任務） | 免費 |
+| `nvidia_vision` | NVIDIA NIM VLM | 圖像理解（base64 直傳，免上傳） | 免費 |
+| `nvidia_image_generate` | NVIDIA FLUX.2-klein-4b | 文生圖 | 免費 |
+
+Config 存於 `~/.open_godot_mcp/config.json`（user home，不在 git repo 內）。詳見 [Docs/02-Tools/Agnes-NVIDIA.md](Docs/02-Tools/Agnes-NVIDIA.md)。
+
 ---
 
 ## 快速開始
@@ -206,7 +221,7 @@ Addon 會自動注入。開啟 AI Client 開始用。
 
 ## 工具清單
 
-~30 tools，~130 actions。read/write 分離設計。
+~35 tools（含 5 個動態註冊的 Agnes/NVIDIA AI 工具），~130 actions。read/write 分離設計。
 
 | 領域 | 工具 | 說明 |
 |------|------|------|
@@ -238,6 +253,11 @@ Addon 會自動注入。開啟 AI Client 開始用。
 | 資產 | `godot_asset` | 生成、管理 |
 | 匯出 | `godot_export` | 預設、匯出 |
 | 健康 | `godot_health` | 連線檢查 |
+| **Agnes 視覺** | `agnes_vision` | 圖像理解（動態註冊） |
+| **Agnes 產圖** | `agnes_image_generate` | 文生圖/圖生圖（動態註冊） |
+| **Agnes 產影片** | `agnes_video_generate` | 非同步影片生成（動態註冊） |
+| **NVIDIA 視覺** | `nvidia_vision` | VLM 圖像理解（動態註冊） |
+| **NVIDIA 產圖** | `nvidia_image_generate` | FLUX 文生圖（動態註冊） |
 
 完整 API 見 [Docs/02-Tools/Index.md](Docs/02-Tools/Index.md)。
 
@@ -291,6 +311,10 @@ Open Godot MCP 是**唯一**支援連線遊戲測試、DAP 除錯器整合（斷
 ### 連線遊戲測試怎麼運作？
 
 Open Godot MCP 可以啟動多個 Godot 實例（host + client）、模擬 peer、注入網路條件（延遲、封包遺失）、驗證遊戲狀態跨實例同步。
+
+### Agnes / NVIDIA AI 工具是什麼？
+
+5 個可選啟用的 AI 工具（視覺、產圖、產影片），整合 Agnes AI API 和 NVIDIA NIM API。預設關閉，需在 dock 面板填入 API key + 勾選子功能後才動態註冊。支援多 key 輪換和 5xx 自動重試。兩家 API 都有免費額度。詳見 [Docs/02-Tools/Agnes-NVIDIA.md](Docs/02-Tools/Agnes-NVIDIA.md)。
 
 ---
 

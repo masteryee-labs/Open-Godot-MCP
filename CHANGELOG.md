@@ -3,6 +3,39 @@
 All notable changes to Open Godot MCP are documented here.
 One entry per release. Version truth = git history + this file.
 
+## [0.1.3] — 2026-07-22
+
+### Added
+
+- **Agnes / NVIDIA API 整合（動態註冊工具）**：5 個新工具，預設關閉，需在 dock 面板手動啟用 + 填 API key + 勾選子功能才會註冊。未啟用時 AI 工具清單完全看不到，防止 AI 在本身已有視覺能力時誤用低階視覺。
+  - `agnes_vision` — Agnes 2.0 Flash 視覺（URL-only，本地檔自動上傳 uguu.se）
+  - `agnes_image_generate` — Agnes Image 2.0 Flash 文生圖/圖生圖（免費）
+  - `agnes_video_generate` — Agnes Video V2.0 產影片（非同步任務，免費）
+  - `nvidia_vision` — NVIDIA NIM VLM 視覺（base64 直傳，免上傳）
+  - `nvidia_image_generate` — NVIDIA FLUX.2-klein-4b 產圖（免費）
+  - Config 存於 `~/.open_godot_mcp/config.json`（user home，不在 git repo 內）
+  - **API key 輪換**：`api_keys` 支援多 key（陣列）。429/402/401 時自動換下一個 key 重試，所有 key 耗盡才 backoff。向後相容舊 `api_key`（單字串）。dock 面板用 TextEdit 一行一 key。
+  - 熱重載：dock 存檔 → bridge event `agnes_config_changed` → MCP server 動態 `add_tool`/`remove_tool`
+  - 限流處理：429/402/401 換 key 重試；所有 key 耗盡 → backoff [2,4,8]s 最多 3 輪；403 `PERMISSION_DENIED` 不輪換不重試
+  - **5xx 自動重試**：500/502/503/504/524 歸類為 `SERVER_ERROR`，backoff [2,4,8]s 重試最多 3 次（依 Agnes 官方文檔 §503「Retry later」建議）。不換 key（server error 非 key 問題）。
+  - git 安全檢查：config 路徑在 git repo 內且未被 .gitignore 排除時，dock 顯示橘色警告（不自動修改 .gitignore）
+  - 詳見 [Docs/02-Tools/Agnes-NVIDIA.md](Docs/02-Tools/Agnes-NVIDIA.md)
+- **Dock i18n**：20 種語言選擇器（對齊 README 翻譯清單）。語言存於 EditorSettings `open_godot_mcp/ui/language`，預設 `en`。翻譯檔由 `scripts/gen_dock_i18n.py` 從單一來源 dict 生成。
+- **新錯誤碼**：`QUOTA_EXHAUSTED`、`AUTH_FAILED`、`API_ERROR`、`SERVER_ERROR`、`UPLOAD_FAILED`（用於 Agnes/NVIDIA 工具）。
+
+### Changed
+
+- **Dock 面板重構**：移除 Settings 按鈕（原僅 print 無實際 UI）、View Log 按鈕（低價值 dump）。保留 Reconnect、Update banner。新增語言選擇器、Agnes/NVIDIA API 區塊、git 安全警告、MCP 未連線提示。
+- `tests/test_server.py`：改用 fixture 隔離 config 路徑（避免測試碰觸真實 user config）；新增 `test_agnes_nvidia_not_registered_by_default` 驗證預設關閉。
+- **清理 git repo**：移除 ~500 個 AHD（Agent Harness Deploy）harness 檔案（`.agents/`、`.devin/`、`.codex/`、`.hermes/`、`.windsurf/`、`AGENTS.md`）和 `plans/` 內部規劃文件。這些是個人 AI 工具鏈設定，非開源產品一部分。`.gitignore` 新增對應排除規則 + secrets 排除（`**/config.json`、`**/api_keys.json`）。
+
+### Internal
+
+- `agnes_config.py`：config 載入/儲存/路徑解析/git 安全檢查（user-home 路徑、chmod 600、deep-merge defaults）。
+- `context.py`：`ServerContext` 加 `_mcp` ref + `_registered_agnes_tools` set + `sync_agnes_tools()` 動態註冊 + `on_agnes_config_event()` bridge event handler。
+- `tools/agnes.py`、`tools/nvidia.py`：工具實作 + uguu.se 上傳 helper + 限流處理 + 5xx 重試。
+- FastMCP 3.x 相容：`remove_tool` 改用 `mcp.local_provider.remove_tool`（top-level 已 deprecated）。
+
 ## [0.1.2] — 2026-07-21
 
 ### Fixed

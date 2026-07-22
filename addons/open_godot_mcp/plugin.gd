@@ -125,6 +125,7 @@ func _ensure_editor_settings() -> void:
 		"open_godot_mcp/security/allow_eval": true,
 		"open_godot_mcp/security/read_only": false,
 		"open_godot_mcp/security/auth_token": "",
+		"open_godot_mcp/ui/language": "en",
 	}
 	for key in defs:
 		if not es.has_setting(key):

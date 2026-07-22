@@ -1,10 +1,12 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://addons/open_godot_mcp/dock/mcp_dock.gd" id="1"]
+[ext_resource type="Script" path="res://addons/open_godot_mcp/dock/i18n.gd" id="2"]
 
 [node name="McpDock" type="Control"]
+clip_contents = true
 script = ExtResource("1")
-custom_minimum_size = Vector2(200, 120)
+custom_minimum_size = Vector2(200, 320)
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,6 +15,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Scroll" type="ScrollContainer" parent="."]
+clip_contents = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -24,32 +27,36 @@ horizontal_scroll_mode = 0
 [node name="VBox" type="VBoxContainer" parent="Scroll"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 4
+theme_override_constants/separation = 6
 
 [node name="Title" type="Label" parent="Scroll/VBox"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Open Godot MCP"
-autowrap_mode = 2
+autowrap_mode = 3
 
 [node name="StatusLabel" type="Label" parent="Scroll/VBox"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Status: Not connected"
-autowrap_mode = 2
+autowrap_mode = 3
 
 [node name="InfoLabel" type="Label" parent="Scroll/VBox"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = ""
-autowrap_mode = 2
+autowrap_mode = 3
 
 [node name="UpdateBanner" type="VBoxContainer" parent="Scroll/VBox"]
 visible = false
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 4
 
 [node name="UpdateLabel" type="Label" parent="Scroll/VBox/UpdateBanner"]
 layout_mode = 2
-autowrap_mode = 2
 size_flags_horizontal = 3
+autowrap_mode = 3
 
 [node name="UpdateBtnRow" type="HBoxContainer" parent="Scroll/VBox/UpdateBanner"]
 layout_mode = 2
@@ -68,22 +75,143 @@ text = "Release notes"
 
 [node name="UpdateSeparator" type="HSeparator" parent="Scroll/VBox/UpdateBanner"]
 layout_mode = 2
+size_flags_horizontal = 3
 
-[node name="Spacer" type="Control" parent="Scroll/VBox"]
+[node name="Spacer1" type="Control" parent="Scroll/VBox"]
 custom_minimum_size = Vector2(0, 4)
 layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="ReconnectBtn" type="Button" parent="Scroll/VBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Reconnect"
 
-[node name="SettingsBtn" type="Button" parent="Scroll/VBox"]
+[node name="LangRow" type="HBoxContainer" parent="Scroll/VBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Settings"
+theme_override_constants/separation = 6
 
-[node name="LogBtn" type="Button" parent="Scroll/VBox"]
+[node name="LangLabel" type="Label" parent="Scroll/VBox/LangRow"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Language"
+
+[node name="LangOption" type="OptionButton" parent="Scroll/VBox/LangRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "View Log"
+custom_minimum_size = Vector2(0, 0)
+
+[node name="Spacer2" type="HSeparator" parent="Scroll/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AgnesSection" type="VBoxContainer" parent="Scroll/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="AgnesTitle" type="Label" parent="Scroll/VBox/AgnesSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Agnes API (free)"
+autowrap_mode = 3
+
+[node name="AgnesEnable" type="CheckButton" parent="Scroll/VBox/AgnesSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Enable Agnes"
+
+[node name="AgnesKeyLabel" type="Label" parent="Scroll/VBox/AgnesSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Agnes API Key"
+autowrap_mode = 3
+
+[node name="AgnesKeyEdit" type="TextEdit" parent="Scroll/VBox/AgnesSection"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+size_flags_horizontal = 3
+secret = true
+placeholder_text = "One key per line:
+sk-xxx
+sk-yyy"
+
+[node name="AgnesVision" type="CheckButton" parent="Scroll/VBox/AgnesSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Vision"
+
+[node name="AgnesImageGen" type="CheckButton" parent="Scroll/VBox/AgnesSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Image gen"
+
+[node name="AgnesVideoGen" type="CheckButton" parent="Scroll/VBox/AgnesSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Video gen"
+
+[node name="NvidiaSection" type="VBoxContainer" parent="Scroll/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="NvidiaTitle" type="Label" parent="Scroll/VBox/NvidiaSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "NVIDIA API (free)"
+autowrap_mode = 3
+
+[node name="NvidiaEnable" type="CheckButton" parent="Scroll/VBox/NvidiaSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Enable NVIDIA"
+
+[node name="NvidiaKeyLabel" type="Label" parent="Scroll/VBox/NvidiaSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "NVIDIA API Key"
+autowrap_mode = 3
+
+[node name="NvidiaKeyEdit" type="TextEdit" parent="Scroll/VBox/NvidiaSection"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+size_flags_horizontal = 3
+secret = true
+placeholder_text = "One key per line:
+nvapi-xxx
+nvapi-yyy"
+
+[node name="NvidiaVision" type="CheckButton" parent="Scroll/VBox/NvidiaSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Vision"
+
+[node name="NvidiaImageGen" type="CheckButton" parent="Scroll/VBox/NvidiaSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Image gen"
+
+[node name="SaveBtn" type="Button" parent="Scroll/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Save"
+
+[node name="SaveStatusLabel" type="Label" parent="Scroll/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = ""
+autowrap_mode = 3
+
+[node name="GitWarningLabel" type="Label" parent="Scroll/VBox"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 3
+
+[node name="ConfigHelpLabel" type="Label" parent="Scroll/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = ""
+autowrap_mode = 3
