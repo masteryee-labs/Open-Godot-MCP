@@ -63,9 +63,9 @@ jobs:
           VERSION="${TAG#v}"
           echo "TAG=$TAG" >> "$GITHUB_ENV"
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
-          # Fetch release body (notes) via GitHub CLI
-          RELEASE_BODY=$(gh release view "$TAG" --json body --jq '.body')
-          # Write to env file (multi-line safe via EOF delimiter)
+          # Fetch release body (notes) via GitHub CLI, then JSON-escape it
+          # (strip surrounding quotes from jq output so handlebars can inline it)
+          RELEASE_BODY=$(gh release view "$TAG" --json body --jq '.body' | jq -Rs 'tojson | .[1:-1]')
           {
             echo "RELEASE_BODY<<EOF_DELIMITER"
             echo "$RELEASE_BODY"
