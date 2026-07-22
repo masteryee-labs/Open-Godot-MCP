@@ -3,6 +3,21 @@
 All notable changes to Open Godot MCP are documented here.
 One entry per release. Version truth = git history + this file.
 
+## [0.1.4] — 2026-07-22
+
+### Added
+
+- **截圖自動清理**：解決截圖無限累積導致專案垃圾檔越來越多的問題。三層清理機制：
+  - **自動輪轉**：每次 `game` / `editor` / `region` / `burst` 存檔後，自動刪除最舊截圖，只保留最近 N 張（預設 50，可設定）。
+  - **過期淘汰**：刪除超過指定時長的舊截圖（預設 24 小時，依檔案修改時間）。
+  - **手動 `cleanup` action**：`godot_screenshot cleanup` 可隨時主動清理，支援 `max_count` / `max_age_hours` 參數覆蓋預設。
+  - 兩個 ProjectSettings 設定項：`open_godot_mcp/screenshot_max_count`（預設 50）、`open_godot_mcp/screenshot_max_age_hours`（預設 24），可在 Godot 專案設定介面調整。
+  - 新增共用工具 `addons/open_godot_mcp/utils/screenshot_cleanup.gd`，editor handler 和 runtime autoload 共用。
+
+### Changed
+
+- `.gitignore` 補完 Python 工具 cache 和 build artifact 排除規則（`.pytest_cache/`、`.ruff_cache/`、`.mypy_cache/`、`*.egg-info/`、`build/`、`dist/`）。
+
 ## [0.1.3] — 2026-07-22
 
 ### Added

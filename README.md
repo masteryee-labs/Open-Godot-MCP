@@ -21,7 +21,7 @@ JSON-LD Structured Data (Schema.org SoftwareApplication)
   "name": "Open Godot MCP",
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Cross-platform",
-  "softwareVersion": "0.1.3",
+  "softwareVersion": "0.1.4",
   "license": "https://opensource.org/licenses/MIT",
   "description": "開源 Model Context Protocol server，讓 AI 自主開發、測試、除錯 Godot 遊戲。具備確定性 playtesting、連線遊戲測試、DAP 除錯、LSP 整合、Token 效率設計。",
   "url": "https://github.com/masteryee-labs/Open-Godot-MCP",
@@ -155,6 +155,7 @@ godot_network simulate_peer count=50           # 壓力測試 50 個 peer
 - **cheap observation**：JSON state digest 取代截圖（省 90% token）
 - **diff 回傳**：只回傳變更部分
 - **截圖壓縮**：JPEG/WebP + 存磁碟（不進 context）
+- **截圖自動清理**：自動輪轉（預設保留最近 50 張）+ 過期淘汰（預設 24 小時）+ 手動 `cleanup` action，防止垃圾檔累積
 - **read/write 分離**：read auto-allow，write gate
 - **批次操作**：一次 round-trip 完成多個操作
 
@@ -239,7 +240,7 @@ Addon 會自動注入。開啟 AI Client 開始用。
 | **輸入** | `godot_input` | 鍵盤/滑鼠/手把/文字 |
 | **狀態** | `godot_runtime_state` | digest/watch/signals |
 | **注入** | `godot_exec` | eval/call/assert |
-| 截圖 | `godot_screenshot` | 壓縮、存檔 |
+| 截圖 | `godot_screenshot` | 壓縮、存檔、自動清理 |
 | 除錯 | `godot_debugger` | DAP breakpoint、stack_trace、variables、evaluate |
 | 程式碼 | `godot_lsp` | 診斷、完成 |
 | 效能 | `godot_profiler` | 快照、時序 |

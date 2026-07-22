@@ -7,6 +7,12 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+build/
+dist/
 
 # Agent Harness Deploy (AHD) — personal AI tooling configs, not part of the open-source product
 .agents/

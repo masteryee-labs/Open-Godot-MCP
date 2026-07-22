@@ -19,6 +19,7 @@ extends Node
 const _VC = preload("res://addons/open_godot_mcp/utils/variant_codec.gd")
 const _EC = preload("res://addons/open_godot_mcp/utils/error_codes.gd")
 const _NetworkConditioner = preload("res://addons/open_godot_mcp/runtime/network_conditioner.gd")
+const _Cleanup = preload("res://addons/open_godot_mcp/utils/screenshot_cleanup.gd")
 
 const CAPTURE_PREFIX := "ogm"
 
@@ -711,6 +712,8 @@ func mcp_screenshot(action: String, params: Dictionary, save_dir: String) -> Dic
 			return _screenshot_region(params, save_dir)
 		"burst":
 			return await _screenshot_burst(params, save_dir)
+		"cleanup":
+			return _screenshot_cleanup(params, save_dir)
 		_:
 			return _EC.fail("INVALID_ARGUMENT", "Unknown screenshot action: %s" % action)
 
@@ -723,6 +726,7 @@ func _screenshot_game(params: Dictionary, save_dir: String) -> Dictionary:
 	var img := vp.get_texture().get_image()
 	img = _resize_img(img, max_width)
 	var path := _save_img(img, save_dir, "game", fmt, quality)
+	_auto_cleanup_screenshots(save_dir)
 	return _EC.ok({"path": path, "size_bytes": _file_size(path), "dimensions": {"width": img.get_width(), "height": img.get_height()}})
 
 
@@ -738,6 +742,7 @@ func _screenshot_region(params: Dictionary, save_dir: String) -> Dictionary:
 	var region_img := img.get_region(Rect2i(x, y, w, h))
 	region_img = _resize_img(region_img, max_width)
 	var path := _save_img(region_img, save_dir, "region", "png", 90)
+	_auto_cleanup_screenshots(save_dir)
 	return _EC.ok({"path": path, "size_bytes": _file_size(path), "dimensions": {"width": region_img.get_width(), "height": region_img.get_height()}})
 
 
@@ -772,6 +777,7 @@ func _screenshot_burst(params: Dictionary, save_dir: String) -> Dictionary:
 			var wait_ms := interval_ms
 			await get_tree().create_timer(wait_ms / 1000.0).timeout
 	var actual_duration := Time.get_ticks_msec() - start
+	_auto_cleanup_screenshots(save_dir)
 	return _EC.ok({"paths": paths, "dimensions": dims, "count": paths.size(), "duration_ms": actual_duration})
 
 
@@ -955,6 +961,19 @@ func _file_size(path: String) -> int:
 		f.close()
 		return s
 	return 0
+
+
+func _screenshot_cleanup(params: Dictionary, save_dir: String) -> Dictionary:
+	var max_count: int = int(params.get("max_count", -1))
+	var max_age_hours: float = float(params.get("max_age_hours", -1.0))
+	var abs_dir := ProjectSettings.globalize_path(save_dir)
+	var r := _Cleanup.cleanup(abs_dir, max_count, max_age_hours)
+	return _EC.ok(r)
+
+
+func _auto_cleanup_screenshots(save_dir: String) -> void:
+	var abs_dir := ProjectSettings.globalize_path(save_dir)
+	_Cleanup.cleanup(abs_dir)
 
 
 func _mouse_button_index(s: String) -> MouseButton:

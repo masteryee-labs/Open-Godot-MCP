@@ -32,6 +32,8 @@ var _runtime_injected: bool = false
 func _enter_tree() -> void:
 	# Register EditorSettings with defaults (Installation Guide §進階設定)
 	_ensure_editor_settings()
+	# Register ProjectSettings defaults for screenshot cleanup
+	_ensure_project_settings()
 
 	# Start the WebSocket bridge server
 	_server = _BridgeServer.new()
@@ -130,6 +132,17 @@ func _ensure_editor_settings() -> void:
 	for key in defs:
 		if not es.has_setting(key):
 			es.set_setting(key, defs[key])
+
+
+func _ensure_project_settings() -> void:
+	var defs := {
+		"open_godot_mcp/screenshot_max_count": 50,
+		"open_godot_mcp/screenshot_max_age_hours": 24,
+	}
+	for key in defs:
+		if not ProjectSettings.has_setting(key):
+			ProjectSettings.set_setting(key, defs[key])
+			ProjectSettings.set_as_basic(key, true)
 
 
 # ---- Runtime autoload injection (Runtime-Autoload.md §啟動流程) ----
