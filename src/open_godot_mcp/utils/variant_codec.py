@@ -101,13 +101,13 @@ def _is_absolute(p: str) -> bool:
 def require_node_path(p: Any, *, name: str = "node_path") -> str:
     if not is_node_path(p):
         raise ValueError(f"{name} must be a node path '/root/...', got: {p!r}")
-    return p
+    return str(p)
 
 
 def require_res_path(p: Any, *, name: str = "path") -> str:
     if not is_res_path(p):
         raise ValueError(f"{name} must be a res:// path, got: {p!r}")
-    return p
+    return str(p)
 
 
 def require_path(p: Any, *, name: str = "path") -> str:

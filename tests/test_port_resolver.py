@@ -1,13 +1,13 @@
 """Test port resolver logic."""
 
 from open_godot_mcp.utils.port_resolver import (
-    env_port,
     DEFAULT_BRIDGE_PORT,
     DEFAULT_DAP_PORT,
     DEFAULT_LSP_PORT,
     allocate_instance_ports,
-    resolve_port,
+    env_port,
     is_port_free,
+    resolve_port,
 )
 
 

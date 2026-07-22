@@ -83,7 +83,7 @@ class ServerContext:
             # so dock hot-reload triggers tool re-sync. Idempotent: on_event
             # appends, but we only register once per bridge object.
             bridge = self.instance_manager.get_bridge()
-            if bridge is not None and not getattr(bridge, "_agnes_handler_registered", False):
+            if bridge is not None and not bridge._agnes_handler_registered:
                 bridge.on_event("agnes_config_changed", self.on_agnes_config_event)
                 bridge._agnes_handler_registered = True
         bridge = self.bridge(instance_id)
@@ -153,9 +153,11 @@ class ServerContext:
         """
         if self._mcp is None:
             return
+        from pathlib import Path
+
         from .agnes_config import all_enabled_tools, load_config
 
-        cfg = load_config(path=path) if path else load_config()
+        cfg = load_config(path=Path(path)) if path else load_config()
         desired = set(all_enabled_tools(cfg))
         current = set(self._registered_agnes_tools)
         # Remove tools that are no longer enabled.
@@ -164,7 +166,7 @@ class ServerContext:
                 # FastMCP 3.x: remove_tool moved to local_provider (top-level
                 # mcp.remove_tool is deprecated). Try new API first, fall back.
                 remover = getattr(self._mcp, "local_provider", self._mcp)
-                remover.remove_tool(name)
+                remover.remove_tool(name)  # type: ignore[attr-defined]
             except Exception as e:  # noqa: BLE001
                 log.warning("remove_tool %s failed: %s", name, e)
         # Add tools that are newly enabled.

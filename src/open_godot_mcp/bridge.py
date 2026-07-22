@@ -89,6 +89,7 @@ class BridgeClient:
     _missed_pongs: int = 0
     _last_pong: float = 0.0
     _reconnect_attempts: int = 0
+    _agnes_handler_registered: bool = False
     _connect_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
     _closed: bool = False
     # Bridge -> Server event queue (for game_started, runtime_ready, etc.)
@@ -234,7 +235,7 @@ class BridgeClient:
         while not self._closed:
             if self._reconnect_attempts < RECONNECT_MAX_ATTEMPTS:
                 idx = min(self._reconnect_attempts, len(RECONNECT_BACKOFF) - 1)
-                delay = RECONNECT_BACKOFF[idx]
+                delay: float = RECONNECT_BACKOFF[idx]
                 log.info(
                     "Reconnect attempt %d/%d in %.1fs",
                     self._reconnect_attempts + 1,
@@ -411,7 +412,5 @@ def resolve_bridge_port(preferred: int | None = None) -> int:
 
 async def probe_bridge(host: str, port: int, timeout: float = 1.0) -> bool:
     """Quick check: is something listening on host:port?"""
-    if not is_port_free(port, host):
-        # Port is in use — could be the bridge. Try a quick WS handshake.
-        return True
-    return False
+    # Port is in use — could be the bridge. Try a quick WS handshake.
+    return not is_port_free(port, host)

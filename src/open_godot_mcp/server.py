@@ -10,7 +10,6 @@ Editor Bridge / runtime. We just route.
 
 from __future__ import annotations
 
-import asyncio
 import logging
 import os
 

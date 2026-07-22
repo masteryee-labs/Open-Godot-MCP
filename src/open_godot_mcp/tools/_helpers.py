@@ -72,7 +72,8 @@ def make_tool(
                 if blocked:
                     return blocked
             try:
-                return await fn(action, params)
+                result: dict = await fn(action, params)
+                return result
             except TypeError as e:
                 return fail("INVALID_ARGUMENT", str(e))
             except ValueError as e:

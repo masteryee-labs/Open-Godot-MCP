@@ -1,16 +1,12 @@
 """Test server builds with all 31 core tools registered (+ dynamic Agnes/NVIDIA)."""
 
 import asyncio
-import json
-import os
-from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 
 from open_godot_mcp import agnes_config as ac
-from open_godot_mcp.server import build_mcp
 from open_godot_mcp.context import ServerContext
+from open_godot_mcp.server import build_mcp
 
 _CORE_TOOLS = {
     "godot_editor_read", "godot_editor_edit",
@@ -47,7 +43,7 @@ def test_all_31_core_tools_registered(isolated_config):
     mcp = build_mcp(ctx)
     tools = asyncio.run(mcp.list_tools())
     tool_names = {t.name for t in tools}
-    assert _CORE_TOOLS == tool_names, f"Missing: {_CORE_TOOLS - tool_names}, Extra: {tool_names - _CORE_TOOLS}"
+    assert tool_names == _CORE_TOOLS, f"Missing: {_CORE_TOOLS - tool_names}, Extra: {tool_names - _CORE_TOOLS}"
 
 
 def test_read_only_mode_blocks_writes(isolated_config):

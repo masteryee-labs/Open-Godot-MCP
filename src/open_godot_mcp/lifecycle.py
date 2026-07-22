@@ -34,9 +34,9 @@ def _parent_is_alive_windows(ppid: int) -> bool:
     if not handle:
         return False
     try:
-        exit_code = ctypes.wintypes.DWORD()
+        exit_code = ctypes.wintypes.DWORD()  # type: ignore[attr-defined]
         if kernel32.GetExitCodeProcess(handle, ctypes.byref(exit_code)):
-            return exit_code.value == STILL_ACTIVE
+            return bool(exit_code.value == STILL_ACTIVE)
         return False
     finally:
         kernel32.CloseHandle(handle)

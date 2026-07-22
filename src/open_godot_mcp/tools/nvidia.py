@@ -40,7 +40,7 @@ HTTP_TIMEOUT = 180
 
 
 def _nvidia_cfg() -> dict:
-    return load_config().get("nvidia", {})
+    return dict(load_config().get("nvidia", {}))
 
 
 def _post_json(url: str, headers: dict, payload: dict, timeout: int = HTTP_TIMEOUT) -> tuple[int, dict | str]:

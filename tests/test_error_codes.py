@@ -1,6 +1,6 @@
 """Test error codes and response builders."""
 
-from open_godot_mcp.utils.error_codes import McpError, err, ok, fail
+from open_godot_mcp.utils.error_codes import McpError, err, fail, ok
 
 
 def test_ok_basic():

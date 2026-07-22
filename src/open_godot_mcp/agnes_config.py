@@ -16,7 +16,7 @@ from __future__ import annotations
 import json
 import logging
 import os
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -145,7 +145,7 @@ def check_git_safety(path: Path | None = None) -> GitSafetyReport:
     """
     path = path or default_config_path()
     inside, root = _is_inside_git_repo(path)
-    if not inside:
+    if not inside or root is None:
         return GitSafetyReport(in_git_repo=False)
     covered = _gitignore_covers(root, path)
     if covered:

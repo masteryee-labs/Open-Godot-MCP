@@ -28,7 +28,6 @@ users register multiple free-tier keys to pool their per-minute quota.
 from __future__ import annotations
 
 import asyncio
-import base64
 import json
 import logging
 import os
@@ -58,7 +57,7 @@ HTTP_TIMEOUT = 180
 
 
 def _agnes_cfg() -> dict:
-    return load_config().get("agnes", {})
+    return dict(load_config().get("agnes", {}))
 
 
 def _post_json(url: str, headers: dict, payload: dict, timeout: int = HTTP_TIMEOUT) -> tuple[int, dict | str]:
@@ -105,7 +104,7 @@ def _get_json(url: str, headers: dict, timeout: int = HTTP_TIMEOUT) -> tuple[int
         return code, body
 
 
-def _classify_http_error(code: int, body: str) -> tuple[str, str]:
+def _classify_http_error(code: int, body: dict | str) -> tuple[str, str]:
     """Map HTTP status to (error_code, message)."""
     snippet = body[:300] if isinstance(body, str) else str(body)[:300]
     if code == 401:

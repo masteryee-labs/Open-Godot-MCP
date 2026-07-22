@@ -1,14 +1,14 @@
 """Test variant codec path helpers."""
 
 from open_godot_mcp.utils.variant_codec import (
+    ensure_vector2,
+    is_color,
     is_node_path,
     is_res_path,
-    require_node_path,
-    require_res_path,
     is_vector2,
     is_vector3,
-    is_color,
-    ensure_vector2,
+    require_node_path,
+    require_res_path,
 )
 
 
