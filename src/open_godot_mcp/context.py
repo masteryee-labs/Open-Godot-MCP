@@ -125,22 +125,37 @@ class ServerContext:
 
     # ---- Agnes/NVIDIA dynamic tool registration ----
 
-    def on_agnes_config_event(self, _params: dict | None = None) -> None:
-        """Bridge event handler: config file changed on disk → re-sync tools."""
-        log.info("agnes_config_changed event received — re-syncing tools")
-        self.sync_agnes_tools()
+    def on_agnes_config_event(self, params: dict | None = None) -> None:
+        """Bridge event handler: config file changed on disk → re-sync tools.
 
-    def sync_agnes_tools(self) -> None:
+        If *params* contains ``config_path``, use that path instead of the
+        default home-dir path. This lets the dock switch to project-level
+        config.
+        """
+        path = None
+        if isinstance(params, dict):
+            cp = params.get("config_path")
+            if isinstance(cp, str) and cp:
+                path = cp
+        if path:
+            log.info("agnes_config_changed event received (path=%s) — re-syncing tools", path)
+        else:
+            log.info("agnes_config_changed event received — re-syncing tools")
+        self.sync_agnes_tools(path=path)
+
+    def sync_agnes_tools(self, path: str | None = None) -> None:
         """Register/unregister agnes_*/nvidia_* tools to match config on disk.
 
         Called at server build time and on hot-reload events from the dock.
         Reads the config file fresh each call. No-op if _mcp is not set.
+
+        If *path* is given, read from that path instead of the default.
         """
         if self._mcp is None:
             return
         from .agnes_config import all_enabled_tools, load_config
 
-        cfg = load_config()
+        cfg = load_config(path=path) if path else load_config()
         desired = set(all_enabled_tools(cfg))
         current = set(self._registered_agnes_tools)
         # Remove tools that are no longer enabled.

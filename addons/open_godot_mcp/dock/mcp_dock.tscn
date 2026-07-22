@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://addons/open_godot_mcp/dock/mcp_dock.gd" id="1"]
 [ext_resource type="Script" path="res://addons/open_godot_mcp/dock/i18n.gd" id="2"]
 
-[node name="McpDock" type="Control"]
+[node name="OpenGodot" type="Control"]
 clip_contents = true
 script = ExtResource("1")
 custom_minimum_size = Vector2(200, 320)
@@ -106,6 +106,46 @@ custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 
+[node name="ScreenshotSection" type="VBoxContainer" parent="Scroll/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="ScreenshotTitle" type="Label" parent="Scroll/VBox/ScreenshotSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Screenshot cleanup"
+autowrap_mode = 3
+
+[node name="ScreenshotRow" type="HBoxContainer" parent="Scroll/VBox/ScreenshotSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="MaxCountLabel" type="Label" parent="Scroll/VBox/ScreenshotSection/ScreenshotRow"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Max count"
+
+[node name="MaxCountSpin" type="SpinBox" parent="Scroll/VBox/ScreenshotSection/ScreenshotRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 999.0
+value = 50.0
+
+[node name="MaxAgeLabel" type="Label" parent="Scroll/VBox/ScreenshotSection/ScreenshotRow"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Max age (h)"
+
+[node name="MaxAgeSpin" type="SpinBox" parent="Scroll/VBox/ScreenshotSection/ScreenshotRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 720.0
+value = 24.0
+
 [node name="AgnesSection" type="VBoxContainer" parent="Scroll/VBox"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -192,6 +232,28 @@ text = "Vision"
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Image gen"
+
+[node name="ConfigLocationSection" type="VBoxContainer" parent="Scroll/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="ConfigLocationTitle" type="Label" parent="Scroll/VBox/ConfigLocationSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Config location"
+autowrap_mode = 3
+
+[node name="ProjectConfigCheck" type="CheckButton" parent="Scroll/VBox/ConfigLocationSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Use project-level config"
+
+[node name="ConfigPathLabel" type="Label" parent="Scroll/VBox/ConfigLocationSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = ""
+autowrap_mode = 3
 
 [node name="SaveBtn" type="Button" parent="Scroll/VBox"]
 layout_mode = 2

@@ -19,6 +19,7 @@ const _I18n = preload("res://addons/open_godot_mcp/dock/i18n.gd")
 
 const _CONFIG_DIR_NAME = ".open_godot_mcp"
 const _CONFIG_FILENAME = "config.json"
+const _SETTING_PROJECT_CONFIG = "open_godot_mcp/config/use_project_config"
 const _DEFAULT_AGNES_BASE_URL = "https://apihub.agnes-ai.com/v1"
 const _DEFAULT_TEXT_MODEL = "agnes-2.0-flash"
 const _DEFAULT_IMAGE_MODEL = "agnes-image-2.0-flash"
@@ -55,6 +56,16 @@ var _loading_config: bool = false  # guard against signals firing while we popul
 @onready var _nvidia_vision: CheckButton = $Scroll/VBox/NvidiaSection/NvidiaVision
 @onready var _nvidia_image_gen: CheckButton = $Scroll/VBox/NvidiaSection/NvidiaImageGen
 
+@onready var _screenshot_title: Label = $Scroll/VBox/ScreenshotSection/ScreenshotTitle
+@onready var _max_count_label: Label = $Scroll/VBox/ScreenshotSection/ScreenshotRow/MaxCountLabel
+@onready var _max_count_spin: SpinBox = $Scroll/VBox/ScreenshotSection/ScreenshotRow/MaxCountSpin
+@onready var _max_age_label: Label = $Scroll/VBox/ScreenshotSection/ScreenshotRow/MaxAgeLabel
+@onready var _max_age_spin: SpinBox = $Scroll/VBox/ScreenshotSection/ScreenshotRow/MaxAgeSpin
+
+@onready var _config_location_title: Label = $Scroll/VBox/ConfigLocationSection/ConfigLocationTitle
+@onready var _project_config_check: CheckButton = $Scroll/VBox/ConfigLocationSection/ProjectConfigCheck
+@onready var _config_path_label: Label = $Scroll/VBox/ConfigLocationSection/ConfigPathLabel
+
 @onready var _save_btn: Button = $Scroll/VBox/SaveBtn
 @onready var _save_status_label: Label = $Scroll/VBox/SaveStatusLabel
 @onready var _git_warning_label: Label = $Scroll/VBox/GitWarningLabel
@@ -75,7 +86,11 @@ func _ready() -> void:
 		_save_btn.pressed.connect(_on_save_pressed)
 	if _lang_option:
 		_lang_option.item_selected.connect(_on_LangOption_item_selected)
+	if _project_config_check:
+		_project_config_check.toggled.connect(_on_project_config_toggled)
 	_load_config_into_ui()
+	_load_screenshot_settings()
+	_load_config_location()
 	_apply_strings()
 	_update_runtime_status()
 
@@ -106,6 +121,70 @@ func set_plugin(plugin: Node) -> void:
 
 func prepare_for_self_update_drain() -> void:
 	pass
+
+
+# ---- screenshot settings (ProjectSettings) ----
+
+const _SETTING_MAX_COUNT := "open_godot_mcp/screenshot_max_count"
+const _SETTING_MAX_AGE := "open_godot_mcp/screenshot_max_age_hours"
+
+
+func _load_screenshot_settings() -> void:
+	var mc := int(ProjectSettings.get_setting(_SETTING_MAX_COUNT, 50))
+	var ma := float(ProjectSettings.get_setting(_SETTING_MAX_AGE, 24.0))
+	if _max_count_spin:
+		_max_count_spin.value = mc
+	if _max_age_spin:
+		_max_age_spin.value = ma
+
+
+func _save_screenshot_settings() -> void:
+	var mc := int(_max_count_spin.value) if _max_count_spin else 50
+	var ma := float(_max_age_spin.value) if _max_age_spin else 24.0
+	ProjectSettings.set_setting(_SETTING_MAX_COUNT, mc)
+	ProjectSettings.set_setting(_SETTING_MAX_AGE, ma)
+	ProjectSettings.set_as_basic(_SETTING_MAX_COUNT, true)
+	ProjectSettings.set_as_basic(_SETTING_MAX_AGE, true)
+	ProjectSettings.save()
+
+
+# ---- config location (EditorSettings) ----
+
+func _load_config_location() -> void:
+	var enabled := _is_project_config_enabled()
+	if _project_config_check:
+		_project_config_check.set_pressed_no_signal(enabled)
+	_update_config_path_label()
+
+
+func _save_config_location() -> void:
+	var es := EditorInterface.get_editor_settings()
+	if es == null:
+		return
+	var enabled := _project_config_check.button_pressed if _project_config_check else false
+	es.set_setting(_SETTING_PROJECT_CONFIG, enabled)
+
+
+func _on_project_config_toggled(_pressed: bool) -> void:
+	_update_config_path_label()
+
+
+func _update_config_path_label() -> void:
+	if _config_path_label == null:
+		return
+	var path := _config_path()
+	var enabled := _is_project_config_enabled()
+	if _project_config_check:
+		enabled = _project_config_check.button_pressed
+	if _i18n:
+		_config_path_label.text = _i18n.t("config_path_label") + path
+	else:
+		_config_path_label.text = "Path: " + path
+	if _config_help_label and _i18n:
+		if enabled:
+			_config_help_label.text = _i18n.t("config_dir_help_project")
+		else:
+			_config_help_label.text = _i18n.t("config_dir_help")
 
 
 # ---- i18n ----
@@ -161,6 +240,19 @@ func _apply_strings() -> void:
 	_nvidia_vision.text = _i18n.t("nvidia_vision")
 	_nvidia_image_gen.text = _i18n.t("nvidia_image_gen")
 	_config_help_label.text = _i18n.t("config_dir_help")
+	# Screenshot section
+	if _screenshot_title:
+		_screenshot_title.text = _i18n.t("screenshot_section")
+	if _max_count_label:
+		_max_count_label.text = _i18n.t("screenshot_max_count")
+	if _max_age_label:
+		_max_age_label.text = _i18n.t("screenshot_max_age")
+	# Config location section
+	if _config_location_title:
+		_config_location_title.text = _i18n.t("config_location_section")
+	if _project_config_check:
+		_project_config_check.text = _i18n.t("project_config_enable")
+	_update_config_path_label()
 	# Re-render status text (it has a localized prefix)
 	if _status_label and not _status_label.text.is_empty():
 		var body := _status_label.text.substr(_status_label.text.find(":") + 1).strip_edges()
@@ -171,12 +263,25 @@ func _apply_strings() -> void:
 
 
 func _config_path() -> String:
+	if _is_project_config_enabled():
+		var root := ProjectSettings.globalize_path("res://")
+		return root.path_join(_CONFIG_DIR_NAME).path_join(_CONFIG_FILENAME)
 	var home := OS.get_environment("USERPROFILE")
 	if home.is_empty():
 		home = OS.get_environment("HOME")
 	if home.is_empty():
 		home = OS.get_system_dir(OS.SYSTEM_DIR_DOCUMENTS)
 	return home.path_join(_CONFIG_DIR_NAME).path_join(_CONFIG_FILENAME)
+
+
+func _is_project_config_enabled() -> bool:
+	var es := EditorInterface.get_editor_settings()
+	if es == null:
+		return false
+	var v = es.get_setting(_SETTING_PROJECT_CONFIG)
+	if v == null:
+		return false
+	return bool(v)
 
 
 func _load_config_into_ui() -> void:
@@ -290,6 +395,9 @@ func _on_save_pressed() -> void:
 	# Restrictive permissions (POSIX no-op on Windows; user-home path is private).
 	# Godot has no chmod API; the Python side applies 0o600 on its own writes.
 	_check_git_safety(path)
+	_save_screenshot_settings()
+	_save_config_location()
+	_update_config_path_label()
 	_save_status_label.text = _i18n.t("saved_status")
 	_save_status_label.add_theme_color_override("font_color", Color.GREEN)
 	# Notify the MCP server to hot-reload its tool registrations.
@@ -302,7 +410,7 @@ func _on_save_pressed() -> void:
 
 func _notify_config_changed() -> void:
 	if _server and _server.has_method("send_event"):
-		_server.send_event("agnes_config_changed", {})
+		_server.send_event("agnes_config_changed", {"config_path": _config_path()})
 
 
 # ---- git safety (warn only; never auto-modify .gitignore) ----

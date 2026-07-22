@@ -28,5 +28,12 @@
   "agnes_url_help": "Base URL: https://apihub.agnes-ai.com/v1",
   "nvidia_url_help": "VLM: integrate.api.nvidia.com  |  สร้างภาพ: ai.api.nvidia.com",
   "enabled_label": "เปิดใช้งาน",
-  "disabled_label": "ปิดใช้งาน"
+  "disabled_label": "ปิดใช้งาน",
+  "screenshot_section": "Screenshot cleanup",
+  "screenshot_max_count": "Max count",
+  "screenshot_max_age": "Max age (h)",
+  "config_location_section": "Config location",
+  "project_config_enable": "Use project-level config",
+  "config_path_label": "Path: ",
+  "config_dir_help_project": "Config stored in this project. Add .open_godot_mcp/ to .gitignore to protect API keys."
 }

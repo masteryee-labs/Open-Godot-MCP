@@ -3,6 +3,19 @@
 All notable changes to Open Godot MCP are documented here.
 One entry per release. Version truth = git history + this file.
 
+## [0.1.6] — 2026-07-22
+
+### Added
+
+- **截圖清理 UI**：Dock 面板新增截圖自動清理設定區（最大保留數 SpinBox + 最大保留時數 SpinBox），直接在 Godot 編輯器內調整，不再需要手動改 ProjectSettings。設定存於 ProjectSettings（per-project）。
+- **專案級設定檔**：Dock 面板新增「設定檔位置」區，含「使用專案級設定檔」勾選框。勾選後 Agnes/NVIDIA API 設定檔存於 `<專案根目錄>/.open_godot_mcp/config.json` 而非使用者家目錄，支援不同專案使用不同 API key。Dock 透過 `agnes_config_changed` 事件將路徑傳給 Python server，server 動態切換讀取位置。
+
+### Changed
+
+- **Dock tab 名稱**：`McpDock` → `OpenGodot`，更直觀。
+- `context.py`：`on_agnes_config_event` 和 `sync_agnes_tools` 支援 `config_path` 參數，接受 dock 傳來的自訂路徑。
+- i18n 新增 7 個 key（`screenshot_section`、`screenshot_max_count`、`screenshot_max_age`、`config_location_section`、`project_config_enable`、`config_path_label`、`config_dir_help_project`），20 語言全部重新生成。
+
 ## [0.1.5] — 2026-07-22
 
 ### Added
