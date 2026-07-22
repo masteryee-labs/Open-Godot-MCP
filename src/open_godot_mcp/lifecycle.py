@@ -29,7 +29,7 @@ def _parent_is_alive_windows(ppid: int) -> bool:
     import ctypes
 
     PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
-    kernel32 = ctypes.windll.kernel32
+    kernel32 = ctypes.windll.kernel32  # type: ignore[attr-defined]
     handle = kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, ppid)
     if not handle:
         return False
