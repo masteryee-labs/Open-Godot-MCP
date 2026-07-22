@@ -35,3 +35,25 @@ jobs:
           files: |
             open-godot-mcp-plugin.zip
             open-godot-mcp-plugin.zip.sha256
+
+  publish-to-asset-library:
+    needs: build-plugin-zip
+    runs-on: ubuntu-latest
+    name: Publish to Godot Asset Library
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#v}"
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Submit asset edit to Godot Asset Library
+        uses: deep-entertainment/godot-asset-lib-action@v0.6.0
+        with:
+          username: ${{ secrets.GODOT_ASSET_LIB_USER }}
+          password: ${{ secrets.GODOT_ASSET_LIB_PASSWORD }}
+          assetId: "5360"
+          assetTemplate: .github/asset-template.json.hb
