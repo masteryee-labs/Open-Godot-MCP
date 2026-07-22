@@ -43,12 +43,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extract version from tag
+      - name: Extract version and release notes from tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG="${GITHUB_REF#refs/tags/}"
           VERSION="${TAG#v}"
           echo "TAG=$TAG" >> "$GITHUB_ENV"
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          # Fetch release body (notes) via GitHub CLI
+          RELEASE_BODY=$(gh release view "$TAG" --json body --jq '.body')
+          # Write to env file (multi-line safe via EOF delimiter)
+          {
+            echo "RELEASE_BODY<<EOF_DELIMITER"
+            echo "$RELEASE_BODY"
+            echo "EOF_DELIMITER"
+          } >> "$GITHUB_ENV"
 
       - name: Submit asset edit to Godot Asset Library
         uses: deep-entertainment/godot-asset-lib-action@v0.6.0
