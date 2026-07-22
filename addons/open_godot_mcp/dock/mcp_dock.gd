@@ -88,11 +88,22 @@ func _ready() -> void:
 		_lang_option.item_selected.connect(_on_LangOption_item_selected)
 	if _project_config_check:
 		_project_config_check.toggled.connect(_on_project_config_toggled)
+	# Allow buttons/checkbuttons to shrink below text width at narrow dock widths.
+	# Without this, long CheckButton labels (e.g. "視覺（看圖，base64 直傳）")
+	# force the VBox to their minimum width, causing right-edge clipping.
+	_apply_text_overrun($Scroll/VBox)
 	_load_config_into_ui()
 	_load_screenshot_settings()
 	_load_config_location()
 	_apply_strings()
 	_update_runtime_status()
+
+
+func _apply_text_overrun(node: Node) -> void:
+	if node is Button:
+		(node as Button).text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	for child in node.get_children():
+		_apply_text_overrun(child)
 
 
 func _process(_delta: float) -> void:
