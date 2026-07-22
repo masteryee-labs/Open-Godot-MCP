@@ -3,6 +3,12 @@
 All notable changes to Open Godot MCP are documented here.
 One entry per release. Version truth = git history + this file.
 
+## [0.1.7] — 2026-07-22
+
+### Fixed
+
+- **Dock 縮窄裁切修正**：截圖清理區原本把「最大保留數 Label + SpinBox + 最大保留時數 Label + SpinBox」4 個元件塞在同一行 HBoxContainer，dock 寬度縮小時最小寬度超過容器導致右側被裁切（`horizontal_scroll_mode = 0` disabled + `clip_contents = true`）。改為拆成兩行，每行只有 Label + SpinBox，最小寬度減半。Label 加 `autowrap_mode = 3` + `size_flags_horizontal = 3`（expand fill），縮窄時文字自動換行不溢出。
+
 ## [0.1.6] — 2026-07-22
 
 ### Added

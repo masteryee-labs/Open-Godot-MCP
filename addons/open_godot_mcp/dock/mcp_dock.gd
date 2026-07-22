@@ -57,10 +57,10 @@ var _loading_config: bool = false  # guard against signals firing while we popul
 @onready var _nvidia_image_gen: CheckButton = $Scroll/VBox/NvidiaSection/NvidiaImageGen
 
 @onready var _screenshot_title: Label = $Scroll/VBox/ScreenshotSection/ScreenshotTitle
-@onready var _max_count_label: Label = $Scroll/VBox/ScreenshotSection/ScreenshotRow/MaxCountLabel
-@onready var _max_count_spin: SpinBox = $Scroll/VBox/ScreenshotSection/ScreenshotRow/MaxCountSpin
-@onready var _max_age_label: Label = $Scroll/VBox/ScreenshotSection/ScreenshotRow/MaxAgeLabel
-@onready var _max_age_spin: SpinBox = $Scroll/VBox/ScreenshotSection/ScreenshotRow/MaxAgeSpin
+@onready var _max_count_label: Label = $Scroll/VBox/ScreenshotSection/ScreenshotRow1/MaxCountLabel
+@onready var _max_count_spin: SpinBox = $Scroll/VBox/ScreenshotSection/ScreenshotRow1/MaxCountSpin
+@onready var _max_age_label: Label = $Scroll/VBox/ScreenshotSection/ScreenshotRow2/MaxAgeLabel
+@onready var _max_age_spin: SpinBox = $Scroll/VBox/ScreenshotSection/ScreenshotRow2/MaxAgeSpin
 
 @onready var _config_location_title: Label = $Scroll/VBox/ConfigLocationSection/ConfigLocationTitle
 @onready var _project_config_check: CheckButton = $Scroll/VBox/ConfigLocationSection/ProjectConfigCheck

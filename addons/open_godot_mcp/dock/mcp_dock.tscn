@@ -117,29 +117,36 @@ size_flags_horizontal = 3
 text = "Screenshot cleanup"
 autowrap_mode = 3
 
-[node name="ScreenshotRow" type="HBoxContainer" parent="Scroll/VBox/ScreenshotSection"]
+[node name="ScreenshotRow1" type="HBoxContainer" parent="Scroll/VBox/ScreenshotSection"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
-[node name="MaxCountLabel" type="Label" parent="Scroll/VBox/ScreenshotSection/ScreenshotRow"]
+[node name="MaxCountLabel" type="Label" parent="Scroll/VBox/ScreenshotSection/ScreenshotRow1"]
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 3
 text = "Max count"
+autowrap_mode = 3
 
-[node name="MaxCountSpin" type="SpinBox" parent="Scroll/VBox/ScreenshotSection/ScreenshotRow"]
+[node name="MaxCountSpin" type="SpinBox" parent="Scroll/VBox/ScreenshotSection/ScreenshotRow1"]
 layout_mode = 2
 size_flags_horizontal = 3
 min_value = 0.0
 max_value = 999.0
 value = 50.0
 
-[node name="MaxAgeLabel" type="Label" parent="Scroll/VBox/ScreenshotSection/ScreenshotRow"]
+[node name="ScreenshotRow2" type="HBoxContainer" parent="Scroll/VBox/ScreenshotSection"]
 layout_mode = 2
-size_flags_horizontal = 0
-text = "Max age (h)"
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
 
-[node name="MaxAgeSpin" type="SpinBox" parent="Scroll/VBox/ScreenshotSection/ScreenshotRow"]
+[node name="MaxAgeLabel" type="Label" parent="Scroll/VBox/ScreenshotSection/ScreenshotRow2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Max age (h)"
+autowrap_mode = 3
+
+[node name="MaxAgeSpin" type="SpinBox" parent="Scroll/VBox/ScreenshotSection/ScreenshotRow2"]
 layout_mode = 2
 size_flags_horizontal = 3
 min_value = 0.0
