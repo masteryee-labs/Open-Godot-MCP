@@ -21,7 +21,7 @@ JSON-LD Structured Data (Schema.org SoftwareApplication)
   "name": "Open Godot MCP",
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Cross-platform",
-  "softwareVersion": "0.1.5",
+  "softwareVersion": "0.1.8",
   "license": "https://opensource.org/licenses/MIT",
   "description": "Open-source Model Context Protocol server for AI-autonomous Godot game development, testing, and debugging. Features deterministic playtesting, multiplayer testing, DAP debugging, LSP integration, and token-efficient design.",
   "url": "https://github.com/masteryee-labs/Open-Godot-MCP",
@@ -39,7 +39,10 @@ JSON-LD Structured Data (Schema.org SoftwareApplication)
     "LSP integration (diagnostics, autocompletion, go-to-definition)",
     "Token-efficient design (JSON digest, diff, screenshot compression)",
     "30+ MCP tools, 130+ actions",
+    "Agnes / NVIDIA AI API integration (vision, image gen, video gen, dynamic registration)",
     "Process lifecycle management (parent watchdog, --shutdown-all)",
+    "Dock screenshot cleanup UI (max count + max age, per-project)",
+    "Project-level config (different API keys per project)",
     "Connection stability (heartbeat, smart reconnect, port auto-avoidance)"
   ],
   "aggregateRating": {
@@ -155,6 +158,7 @@ Every tool has token-saving design:
 - **Cheap observation**: JSON state digest replaces screenshots (saves 90% tokens)
 - **Diff returns**: Only return changed parts
 - **Screenshot compression**: JPEG/WebP + save to disk (not in context)
+- **Automatic screenshot cleanup**: Rotation (default keep latest 50) + age eviction (default 24h) + manual `cleanup` action. v0.1.6+ adjustable directly in the Dock panel (per-project)
 - **Read/write separation**: read auto-allow, write gated
 - **Batch operations**: Complete multiple operations in one round-trip
 

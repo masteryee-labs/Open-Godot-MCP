@@ -58,3 +58,27 @@ Thumbs.db
 # Self-update artifacts (update_reload_runner.gd)
 *.update_backup
 *.ogm_update_tmp
+
+# Coverage / profiling
+.coverage
+htmlcov/
+.coverage.*
+coverage.xml
+*.prof
+
+# Jupyter / IPython
+.ipynb_checkpoints/
+
+# Type stubs cache
+.pytype/
+
+# Poetry / Pipenv
+Pipfile.lock
+poetry.lock
+
+# Windows shortcuts
+*.lnk
+
+# Godot addon export temp
+*.tmp.scn
+*.tmp.tscn

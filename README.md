@@ -21,7 +21,7 @@ JSON-LD Structured Data (Schema.org SoftwareApplication)
   "name": "Open Godot MCP",
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Cross-platform",
-  "softwareVersion": "0.1.5",
+  "softwareVersion": "0.1.8",
   "license": "https://opensource.org/licenses/MIT",
   "description": "開源 Model Context Protocol server，讓 AI 自主開發、測試、除錯 Godot 遊戲。具備確定性 playtesting、連線遊戲測試、DAP 除錯、LSP 整合、Token 效率設計。",
   "url": "https://github.com/masteryee-labs/Open-Godot-MCP",
@@ -41,6 +41,8 @@ JSON-LD Structured Data (Schema.org SoftwareApplication)
     "30+ MCP tools，130+ actions",
     "Agnes / NVIDIA AI API 整合（視覺、產圖、產影片，動態註冊）",
     "行程生命週期管理（parent watchdog、--shutdown-all）",
+    "Dock 面板截圖清理 UI（最大保留數 + 最大保留時數，per-project）",
+    "專案級設定檔（每個專案可用不同 API key）",
     "連線穩定（心跳、智慧重連、port 自動避讓）"
   ],
   "aggregateRating": {
@@ -156,7 +158,7 @@ godot_network simulate_peer count=50           # 壓力測試 50 個 peer
 - **cheap observation**：JSON state digest 取代截圖（省 90% token）
 - **diff 回傳**：只回傳變更部分
 - **截圖壓縮**：JPEG/WebP + 存磁碟（不進 context）
-- **截圖自動清理**：自動輪轉（預設保留最近 50 張）+ 過期淘汰（預設 24 小時）+ 手動 `cleanup` action，防止垃圾檔累積
+- **截圖自動清理**：自動輪轉（預設保留最近 50 張）+ 過期淘汰（預設 24 小時）+ 手動 `cleanup` action，防止垃圾檔累積。v0.1.6+ 可直接在 Dock 面板調整保留數和時數（per-project）
 - **read/write 分離**：read auto-allow，write gate
 - **批次操作**：一次 round-trip 完成多個操作
 
@@ -201,7 +203,7 @@ uv sync
 | `nvidia_vision` | NVIDIA NIM VLM | 圖像理解（base64 直傳，免上傳） | 免費 |
 | `nvidia_image_generate` | NVIDIA FLUX.2-klein-4b | 文生圖 | 免費 |
 
-Config 存於 `~/.open_godot_mcp/config.json`（user home，不在 git repo 內）。詳見 [Docs/02-Tools/Agnes-NVIDIA.md](Docs/02-Tools/Agnes-NVIDIA.md)。
+Config 預設存於 `~/.open_godot_mcp/config.json`（user home，不在 git repo 內）。v0.1.6+ 可在 Dock 面板勾選「使用專案級設定檔」，改存於 `<專案>/.open_godot_mcp/config.json`（per-project，不同專案可用不同 API key）。詳見 [Docs/02-Tools/Agnes-NVIDIA.md](Docs/02-Tools/Agnes-NVIDIA.md)。
 
 ---
 

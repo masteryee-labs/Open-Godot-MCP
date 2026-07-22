@@ -3,6 +3,17 @@
 All notable changes to Open Godot MCP are documented here.
 One entry per release. Version truth = git history + this file.
 
+## [0.1.8] — 2026-07-22
+
+### Fixed
+
+- **Dock 極窄裁切根因修正**：CheckButton/Button 的文字有不可壓縮的最小寬度，長文字（如「視覺（看圖，base64 直傳）」）強迫 VBox 至其最小寬度，dock 縮到最窄時右邊被裁掉約一個中文字元。`_ready()` 遞迴設所有 Button/CheckButton/OptionButton 的 `text_overrun_behavior = OVERRUN_TRIM_ELLIPSIS`，允許按鈕縮到文字寬度以下並顯示「…」而非硬裁切。
+- **截圖清理區排列改善**：從 HBoxContainer（Label + SpinBox 同行）改為 VBoxContainer（Label 在上、SpinBox 在下），SpinBox 取得完整列寬，不再跟 Label 搶水平空間。
+
+### Changed
+
+- **.gitignore 補充**：新增 coverage/profiling（`.coverage`、`htmlcov/`、`coverage.xml`、`*.prof`）、Jupyter（`.ipynb_checkpoints/`）、type stubs（`.pytype/`）、Poetry/Pipfile lock、Windows shortcuts（`*.lnk`）、Godot export temp（`*.tmp.scn`、`*.tmp.tscn`）等開源專案常見排除項。
+
 ## [0.1.7] — 2026-07-22
 
 ### Fixed
