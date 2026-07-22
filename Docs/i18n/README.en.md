@@ -313,6 +313,54 @@ Open Godot MCP can launch multiple Godot instances (host + clients), simulate pe
 
 ---
 
+## Security
+
+Open Godot MCP lets AI operate inside the Godot editor and game runtime. Here's what you should know:
+
+### Network Exposure
+
+All WebSocket connections bind to `127.0.0.1` (localhost only) — not exposed to LAN/WAN. Bridge supports `auth_token` authentication (set `open_godot_mcp/security/auth_token` in Godot EditorSettings). Without a token set, all local connections are accepted.
+
+### API Key Security
+
+Agnes / NVIDIA API keys are stored in `~/.open_godot_mcp/config.json` (user home, not in git repo). File permissions are set to `0o600` (POSIX, owner-only). `.gitignore` globally excludes `**/config.json` to prevent accidental commits. When using project-level config, a built-in git safety check detects if the config is inside a git repo and warns the user.
+
+### godot_exec eval Risk
+
+`godot_exec eval` lets the AI execute arbitrary GDScript in the running game. This is required for deterministic playtesting (AI needs to set up test scenarios, call methods, assert conditions). GDScript is constrained by the Godot sandbox, but can still access the filesystem and network.
+
+If you don't need eval, disable it with `--no-eval`:
+
+```bash
+open-godot-mcp --no-eval
+```
+
+### Hardening Options
+
+```bash
+# Disable eval (no arbitrary GDScript execution)
+open-godot-mcp --no-eval
+
+# Read-only mode (no write operations)
+open-godot-mcp --read-only
+
+# Restrict file access to specific directories
+open-godot-mcp --allowed-paths /path/to/project
+
+# All three layers at once
+open-godot-mcp --no-eval --read-only --allowed-paths /path/to/project
+```
+
+### Prompt Injection Awareness
+
+AI can be vulnerable to prompt injection (e.g., malicious instructions hidden in in-game text, web content, or user input). Recommendations:
+
+- Use `--no-eval` + `--allowed-paths` in production environments
+- Do not expose Bridge connections on public networks
+- Periodically check `~/.open_godot_mcp/config.json` for leaked API keys
+
+---
+
 ## Documentation
 
 Full documentation index: [Docs/README.md](Docs/README.md). Decoupled by folder.
