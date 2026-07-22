@@ -27,6 +27,7 @@ from typing import Any
 import websockets
 from websockets.exceptions import ConnectionClosed
 
+from . import __version__
 from .utils.error_codes import fail
 from .utils.port_resolver import (
     DEFAULT_BRIDGE_PORT,
@@ -74,7 +75,7 @@ class BridgeClient:
     host: str = "127.0.0.1"
     port: int = DEFAULT_BRIDGE_PORT
     auth_token: str = ""
-    server_version: str = "0.1.0"
+    server_version: str = __version__
 
     # Runtime state
     _ws: Any = None  # websockets connection

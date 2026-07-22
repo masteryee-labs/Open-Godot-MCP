@@ -9,6 +9,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 
+from . import __version__
 from .bridge import BridgeClient
 from .game_instance_manager import GameInstanceManager
 from .instance_manager import InstanceManager
@@ -27,7 +28,7 @@ class ServerContext:
     allow_eval: bool = True
     allowed_paths: list[str] | None = None
     projects: list[str] | None = None
-    server_version: str = "0.1.0"
+    server_version: str = __version__
     # Lazy-adopt state (set by server.run_stdio)
     _pending_adopts: list[str] = field(default_factory=list)
     _adopt_host: str = "127.0.0.1"

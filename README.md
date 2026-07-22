@@ -21,7 +21,7 @@ JSON-LD Structured Data (Schema.org SoftwareApplication)
   "name": "Open Godot MCP",
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Cross-platform",
-  "softwareVersion": "0.1.4",
+  "softwareVersion": "0.1.5",
   "license": "https://opensource.org/licenses/MIT",
   "description": "開源 Model Context Protocol server，讓 AI 自主開發、測試、除錯 Godot 遊戲。具備確定性 playtesting、連線遊戲測試、DAP 除錯、LSP 整合、Token 效率設計。",
   "url": "https://github.com/masteryee-labs/Open-Godot-MCP",
@@ -40,6 +40,7 @@ JSON-LD Structured Data (Schema.org SoftwareApplication)
     "Token 效率設計（JSON digest、diff、截圖壓縮）",
     "30+ MCP tools，130+ actions",
     "Agnes / NVIDIA AI API 整合（視覺、產圖、產影片，動態註冊）",
+    "行程生命週期管理（parent watchdog、--shutdown-all）",
     "連線穩定（心跳、智慧重連、port 自動避讓）"
   ],
   "aggregateRating": {
@@ -168,13 +169,27 @@ godot_network simulate_peer count=50           # 壓力測試 50 個 peer
 - 心跳機制（主動偵測死連線）
 - 智慧重連（指數退避 + 最大次數 + UI 通知）
 
-### 5. 完整除錯
+### 5. 行程生命週期管理（Windows 孤兒行程防護）
+
+MCP stdio 架構下，每個 AI client session 各自啟動一個 server 行程。Windows 殺 parent 時不會關閉 child 的 inherited stdin handle，導致孤兒行程永遠活著、越積越多。
+
+- **Parent watchdog**：server 啟動後每 5 秒檢查 parent 是否存活，parent 消失即自動退出
+- **`--shutdown-all`**：更新前一鍵清除所有殘留行程，解鎖 `.exe`，不需重開電腦
+
+```bash
+# 更新前清場（殺所有殘留 server 行程）
+open-godot-mcp --shutdown-all
+# 再跑更新
+uv sync
+```
+
+### 6. 完整除錯
 
 - **DAP（Debugger Adapter Protocol）**：breakpoint、step、變數 inspect（stack_trace、variables、evaluate）
 - **LSP（Language Server Protocol）**：靜態診斷、自動完成、go-to-definition
 - **Profiler**：效能快照、時序分析、spike 偵測
 
-### 6. Agnes / NVIDIA AI API 整合（動態註冊）
+### 7. Agnes / NVIDIA AI API 整合（動態註冊）
 
 5 個 AI 工具可選啟用，預設關閉。在 dock 面板填入 API key + 勾選子功能後才動態註冊，未啟用時 AI 工具清單完全看不到。支援多 key 輪換（429/402/401 自動換 key）+ 5xx 自動重試。
 

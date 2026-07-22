@@ -3,6 +3,20 @@
 All notable changes to Open Godot MCP are documented here.
 One entry per release. Version truth = git history + this file.
 
+## [0.1.5] — 2026-07-22
+
+### Added
+
+- **行程生命週期管理**：解決 Windows 上 MCP server 孤兒行程無限累積的問題（每次 MCP client crash/重啟就漏一個行程，像病毒一樣越開越多）。
+  - **Parent watchdog**：server 啟動時起一個 daemon thread，每 5 秒檢查 parent 行程是否存活。parent 死了 → 立即 self-exit。Linux/macOS 靠 stdin EOF 自然退出，Windows 的 inherited handle 不會關閉，需要這個 watchdog 才能清理孤兒。
+  - **`--shutdown-all` CLI 命令**：`open-godot-mcp --shutdown-all` 終止所有執行中的 `open-godot-mcp` 行程（不含自己）。更新前跑一次即可解鎖 `.exe`，不再需要手動工作管理員或重開電腦。
+  - 新增 `src/open_godot_mcp/lifecycle.py`：parent 存活檢查（跨平台）、watchdog thread、`shutdown_all_instances()`。
+
+### Changed
+
+- **版本號單一真相來源**：`__init__.py` 改用 `importlib.metadata.version()` 從 pyproject.toml 讀取，`__main__.py`、`context.py`、`bridge.py` 全部引用 `__version__`。不再需要手動同步 4 個檔案的版號。
+- `.gitignore` 補完開源專案常見排除：`.env`、`*.log`、`.idea/`、`.vscode/`、編輯器暫存、自我更新殘留檔（`*.update_backup`、`*.ogm_update_tmp`）。
+
 ## [0.1.4] — 2026-07-22
 
 ### Added

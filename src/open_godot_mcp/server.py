@@ -12,10 +12,12 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 
 from fastmcp import FastMCP
 
 from .context import ServerContext
+from .lifecycle import start_parent_watchdog_thread
 from .tools import register_all_tools
 from .utils.port_resolver import DEFAULT_BRIDGE_PORT, env_port
 
@@ -94,6 +96,12 @@ def run_stdio(
 
     mcp = build_mcp(ctx)
     log.info("Starting Open Godot MCP server (stdio) v%s", ctx.server_version)
+
+    ppid = os.getppid()
+    if ppid > 1:
+        start_parent_watchdog_thread(ppid)
+        log.debug("Parent watchdog started (parent PID %d)", ppid)
+
     mcp.run(transport="stdio")
 
 

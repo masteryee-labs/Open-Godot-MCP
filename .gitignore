@@ -42,3 +42,19 @@ verify_out.txt
 # OS
 .DS_Store
 Thumbs.db
+
+# Editor / IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Environment & logs
+.env
+.env.*
+*.log
+
+# Self-update artifacts (update_reload_runner.gd)
+*.update_backup
+*.ogm_update_tmp

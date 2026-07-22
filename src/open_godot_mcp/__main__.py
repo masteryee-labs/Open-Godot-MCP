@@ -10,6 +10,7 @@ import logging
 import sys
 from pathlib import Path
 
+from . import __version__
 from .server import run_stdio
 
 log = logging.getLogger("open_godot_mcp")
@@ -20,7 +21,13 @@ def _build_parser() -> argparse.ArgumentParser:
         prog="open-godot-mcp",
         description="Open Godot MCP — MCP server for AI-driven Godot development.",
     )
-    parser.add_argument("--version", action="version", version="open-godot-mcp 0.1.0")
+    parser.add_argument("--version", action="version", version=f"open-godot-mcp {__version__}")
+    parser.add_argument(
+        "--shutdown-all",
+        action="store_true",
+        help="Terminate all running open-godot-mcp processes (except this one) and exit. "
+        "Run this before `uv sync` to unlock the .exe on Windows.",
+    )
     # Connection
     parser.add_argument(
         "--bridge-host",
@@ -81,6 +88,12 @@ def main() -> None:
         target = Path(args.install_addon)
         ok = install_addon(target)
         sys.exit(0 if ok else 1)
+
+    # --shutdown-all: kill all running instances then exit
+    if args.shutdown_all:
+        from .lifecycle import shutdown_all_instances
+
+        sys.exit(shutdown_all_instances())
 
     allowed_paths: list[str] | None = None
     if args.allowed_paths:

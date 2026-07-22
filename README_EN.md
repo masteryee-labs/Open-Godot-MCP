@@ -21,7 +21,7 @@ JSON-LD Structured Data (Schema.org SoftwareApplication)
   "name": "Open Godot MCP",
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Cross-platform",
-  "softwareVersion": "0.1.0",
+  "softwareVersion": "0.1.5",
   "license": "https://opensource.org/licenses/MIT",
   "description": "Open-source Model Context Protocol server for AI-autonomous Godot game development, testing, and debugging. Features deterministic playtesting, multiplayer testing, DAP debugging, LSP integration, and token-efficient design.",
   "url": "https://github.com/masteryee-labs/Open-Godot-MCP",
@@ -39,6 +39,7 @@ JSON-LD Structured Data (Schema.org SoftwareApplication)
     "LSP integration (diagnostics, autocompletion, go-to-definition)",
     "Token-efficient design (JSON digest, diff, screenshot compression)",
     "30+ MCP tools, 130+ actions",
+    "Process lifecycle management (parent watchdog, --shutdown-all)",
     "Connection stability (heartbeat, smart reconnect, port auto-avoidance)"
   ],
   "aggregateRating": {
@@ -166,7 +167,21 @@ Solves the "can't connect" problem in existing MCPs:
 - Heartbeat mechanism (proactive dead connection detection)
 - Smart reconnect (exponential backoff + max retries + UI notification)
 
-### 5. Complete Debugging
+### 5. Process Lifecycle Management (Windows Orphan Protection)
+
+With MCP stdio transport, each AI client session spawns its own server process. On Windows, killing the parent does not close the child's inherited stdin handle, causing orphaned processes to accumulate indefinitely.
+
+- **Parent watchdog**: server checks every 5s if parent is alive; self-exits when parent disappears
+- **`--shutdown-all`**: one command to clear all residual processes before updating, unlocking the `.exe` without rebooting
+
+```bash
+# Clear residual processes before update
+open-godot-mcp --shutdown-all
+# Then update
+uv sync
+```
+
+### 6. Complete Debugging
 
 - **DAP (Debugger Adapter Protocol)**: breakpoints, stepping, variable inspection (stack_trace, variables, evaluate)
 - **LSP (Language Server Protocol)**: static diagnostics, autocompletion, go-to-definition
