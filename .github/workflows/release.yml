@@ -3,12 +3,19 @@ name: Release
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to publish (e.g. v0.1.8)"
+        required: true
+        type: string
 
 permissions:
   contents: write
 
 jobs:
   build-plugin-zip:
+    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,6 +45,7 @@ jobs:
 
   publish-to-asset-library:
     needs: build-plugin-zip
+    if: always() && (github.event_name == 'workflow_dispatch' || needs.build-plugin-zip.result == 'success')
     runs-on: ubuntu-latest
     name: Publish to Godot Asset Library
     steps:
@@ -47,7 +55,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG="${GITHUB_REF#refs/tags/}"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ github.event.inputs.tag }}"
+          else
+            TAG="${GITHUB_REF#refs/tags/}"
+          fi
           VERSION="${TAG#v}"
           echo "TAG=$TAG" >> "$GITHUB_ENV"
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
