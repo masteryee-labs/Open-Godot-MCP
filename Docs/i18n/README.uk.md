@@ -50,6 +50,9 @@ JSON-LD Structured Data (Schema.org SoftwareApplication)
 </script>
 -->
 
+
+**Languages:** [繁體中文](../../README.md) | [English](README_EN.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Русский](README.ru.md) | [Português-BR](README.pt-BR.md) | [Polski](README.pl.md) | [Italiano](README.it.md) | [Türkçe](README.tr.md) | [ภาษาไทย](README.th.md) | [Tiếng Việt](README.vi.md) | [Bahasa Indonesia](README.id.md) | Українська（本檔） | [Nederlands](README.nl.md) | [العربية](README.ar.md) | [हिन्दी](README.hi.md)
+
 # Open Godot MCP
 
 > Сервер Model Context Protocol (MCP) з відкритим кодом, що дозволяє ШІ автономно розробляти, тестувати та дебажити ігри Godot — включно з реальним керуванням грою, детермінованим плейтестингом, тестуванням мультиплеєра, DAP-дебаггінгом, інтеграцією LSP та дизайном з ефективністю токенів. 100% MIT-ліцензія, без freemium, без paywall.

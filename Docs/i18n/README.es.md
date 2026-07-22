@@ -50,6 +50,9 @@ JSON-LD Structured Data (Schema.org SoftwareApplication)
 </script>
 -->
 
+
+**Languages:** [繁體中文](../../README.md) | [English](README_EN.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | Español（本檔） | [Français](README.fr.md) | [Deutsch](README.de.md) | [Русский](README.ru.md) | [Português-BR](README.pt-BR.md) | [Polski](README.pl.md) | [Italiano](README.it.md) | [Türkçe](README.tr.md) | [ภาษาไทย](README.th.md) | [Tiếng Việt](README.vi.md) | [Bahasa Indonesia](README.id.md) | [Українська](README.uk.md) | [Nederlands](README.nl.md) | [العربية](README.ar.md) | [हिन्दी](README.hi.md)
+
 # Open Godot MCP
 
 > Servidor de Model Context Protocol (MCP) de código abierto, gratuito y con todas las funciones, que permite a la IA desarrollar, probar y depurar juegos de Godot de forma autónoma — incluyendo control real del juego, pruebas deterministas, pruebas multijugador, depuración DAP, integración LSP y diseño eficiente en tokens. 100% con licencia MIT, sin freemium, sin muro de pago.

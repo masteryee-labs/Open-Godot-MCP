@@ -63,7 +63,7 @@ JSON-LD Structured Data (Schema.org SoftwareApplication)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11+-green.svg)](https://python.org)
 [![MCP](https://badge.mcpx.dev?type=server)](https://modelcontextprotocol.io)
 
-**Languages:** 繁體中文（本檔）| [English](README_EN.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Русский](README.ru.md) | [Português-BR](README.pt-BR.md) | [Polski](README.pl.md) | [Italiano](README.it.md) | [Türkçe](README.tr.md) | [ภาษาไทย](README.th.md) | [Tiếng Việt](README.vi.md) | [Bahasa Indonesia](README.id.md) | [Українська](README.uk.md) | [Nederlands](README.nl.md) | [العربية](README.ar.md) | [हिन्दी](README.hi.md)
+**Languages:** 繁體中文（本檔）| [English](Docs/i18n/README_EN.md) | [简体中文](Docs/i18n/README.zh-CN.md) | [日本語](Docs/i18n/README.ja.md) | [한국어](Docs/i18n/README.ko.md) | [Español](Docs/i18n/README.es.md) | [Français](Docs/i18n/README.fr.md) | [Deutsch](Docs/i18n/README.de.md) | [Русский](Docs/i18n/README.ru.md) | [Português-BR](Docs/i18n/README.pt-BR.md) | [Polski](Docs/i18n/README.pl.md) | [Italiano](Docs/i18n/README.it.md) | [Türkçe](Docs/i18n/README.tr.md) | [ภาษาไทย](Docs/i18n/README.th.md) | [Tiếng Việt](Docs/i18n/README.vi.md) | [Bahasa Indonesia](Docs/i18n/README.id.md) | [Українська](Docs/i18n/README.uk.md) | [Nederlands](Docs/i18n/README.nl.md) | [العربية](Docs/i18n/README.ar.md) | [हिन्दी](Docs/i18n/README.hi.md)
 
 ---
 

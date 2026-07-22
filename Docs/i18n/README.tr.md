@@ -50,6 +50,9 @@ JSON-LD Structured Data (Schema.org SoftwareApplication)
 </script>
 -->
 
+
+**Languages:** [繁體中文](../../README.md) | [English](README_EN.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Русский](README.ru.md) | [Português-BR](README.pt-BR.md) | [Polski](README.pl.md) | [Italiano](README.it.md) | Türkçe（本檔） | [ภาษาไทย](README.th.md) | [Tiếng Việt](README.vi.md) | [Bahasa Indonesia](README.id.md) | [Українська](README.uk.md) | [Nederlands](README.nl.md) | [العربية](README.ar.md) | [हिन्दी](README.hi.md)
+
 # Open Godot MCP
 
 > Açık kaynaklı, ücretsiz, tam özellikli Model Context Protocol (MCP) sunucusu — yapay zekanın Godot oyunlarını otonom olarak geliştirmesini, test etmesini ve hata ayıklamasını sağlar; gerçek oyun kontrolü, deterministik oyun testi, çok oyunculu test, DAP hata ayıklama, LSP entegrasyonu ve token verimli tasarım dahil. %100 MIT lisanslı, freemium yok, ödeme duvarı yok.
