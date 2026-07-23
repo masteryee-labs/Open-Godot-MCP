@@ -54,6 +54,8 @@ jobs:
       - name: Extract version and build asset template
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LANG: C.UTF-8
+          LC_ALL: C.UTF-8
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             TAG="${{ github.event.inputs.tag }}"
@@ -61,8 +63,10 @@ jobs:
             TAG="${GITHUB_REF#refs/tags/}"
           fi
           VERSION="${TAG#v}"
-          # Fetch release body (raw text with real newlines)
-          RELEASE_BODY=$(gh release view "$TAG" --json body | jq -r '.body')
+          # Fetch release body (raw text with real newlines).
+          # Use gh's built-in --jq (Go encoding/json, UTF-8 safe) instead of
+          # piping to jq, which mangles multibyte CJK under non-UTF-8 locale.
+          RELEASE_BODY=$(gh release view "$TAG" --json body --jq '.body')
           # Build the final JSON template using jq (handles all escaping correctly)
           # The handlebars action will render it, but since there are no {{ }} vars,
           # it passes through unchanged.
