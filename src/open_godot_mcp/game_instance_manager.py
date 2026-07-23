@@ -196,6 +196,12 @@ class GameInstanceManager:
         self._mark_active(instance_id)
         return ok()
 
+    def clear_active(self) -> None:
+        """Clear the active game instance so runtime tools fall back to the editor."""
+        for inst in self._instances.values():
+            inst.active = False
+        self._active_id = None
+
     def _mark_active(self, instance_id: str) -> None:
         for inst in self._instances.values():
             inst.active = inst.instance_id == instance_id

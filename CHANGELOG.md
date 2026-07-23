@@ -3,6 +3,19 @@
 All notable changes to Open Godot MCP are documented here.
 One entry per release. Version truth = git history + this file.
 
+## [0.1.9] — 2026-07-23
+
+### Added
+
+- **遊戲實體路由（Game Instance Routing）**：當透過 `godot_network switch` 切換到獨立遊戲行程時，runtime 類工具（`godot_exec`、`godot_game`、`godot_game_time`、`godot_input`、`godot_runtime_state`、`godot_screenshot`、`godot_profiler`、`godot_log`）自動路由到該遊戲行程，而非編輯器的 PIE。編輯器專屬工具（`godot_editor_read`、`godot_scene`、`godot_node_read`、`godot_script`、`godot_project`）仍走編輯器 bridge，互不干擾。明確指定 `instance_id` 時優先於 active instance。
+- **`godot_network switch` 支援 `editor`**：傳入 `instance_id="editor"`（或空字串）可清除 active game instance，讓 runtime 工具回退到編輯器。
+- **`GameInstanceManager.clear_active()`**：新增 API 清除 active game instance。
+- **Runtime autoload 新增 `play` / `stop` / `status` 方法**：standalone runtime 可回報 `runtime_ready`、`is_playing`、`runtime_connected`、`fps`，並支援停止行程。
+
+### Tests
+
+- 新增 `tests/test_game_instance_routing.py`（8 個測試）：涵蓋 runtime 工具集定義、路由到 active game instance、編輯器工具不路由、無 game instance 時回退編輯器、明確 `instance_id` 覆寫、`clear_active()` 行為、`switch editor` 清除 active。
+
 ## [0.1.8] — 2026-07-22
 
 ### Fixed

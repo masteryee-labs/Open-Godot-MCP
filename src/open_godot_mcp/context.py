@@ -17,6 +17,14 @@ from .utils.error_codes import fail
 
 log = logging.getLogger(__name__)
 
+# Tools that operate on the running game (not the editor). When a game
+# instance is active via godot_network switch, these route to the standalone
+# game process instead of the editor's PIE.
+_RUNTIME_TOOLS: frozenset[str] = frozenset({
+    "godot_exec", "godot_game", "godot_game_time", "godot_input",
+    "godot_runtime_state", "godot_screenshot", "godot_profiler", "godot_log",
+})
+
 
 @dataclass
 class ServerContext:
@@ -86,6 +94,17 @@ class ServerContext:
             if bridge is not None and not bridge._agnes_handler_registered:
                 bridge.on_event("agnes_config_changed", self.on_agnes_config_event)
                 bridge._agnes_handler_registered = True
+        # When no explicit instance_id is given and a game instance is active
+        # (set via godot_network switch), route runtime tools to the standalone
+        # game process. Editor-only tools still go to the editor bridge.
+        if (
+            instance_id is None
+            and tool in _RUNTIME_TOOLS
+            and self.game_instance_manager.active_id is not None
+        ):
+            gi_bridge = self.game_instance_manager.get_bridge()
+            if gi_bridge is not None:
+                return await gi_bridge.call_tool(tool, action, params, timeout=timeout)
         bridge = self.bridge(instance_id)
         if bridge is None:
             return fail("BRIDGE_NOT_CONNECTED", "No Godot instance connected")

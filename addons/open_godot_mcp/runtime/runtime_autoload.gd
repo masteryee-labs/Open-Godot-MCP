@@ -250,6 +250,17 @@ func mcp_handle(method: String, params: Dictionary) -> Dictionary:
 		"resume":
 			get_tree().paused = false
 			return _EC.ok()
+		"play":
+			return _EC.ok({"runtime_ready": true})
+		"stop":
+			get_tree().quit()
+			return _EC.ok()
+		"status":
+			return _EC.ok({
+				"is_playing": true,
+				"runtime_connected": _standalone_mode,
+				"fps": int(Engine.get_frames_per_second()),
+			})
 		_:
 			return _EC.fail("INVALID_ARGUMENT", "Unknown method: %s" % method)
 

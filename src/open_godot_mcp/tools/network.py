@@ -61,7 +61,10 @@ def register_network_tools(mcp: FastMCP, ctx: ServerContext) -> None:
                 return blocked
             iid = params.get("instance_id")
             if not iid:
-                return fail("INVALID_ARGUMENT", "instance_id required")
+                return fail("INVALID_ARGUMENT", "instance_id required (use 'editor' to switch back to editor)")
+            if iid in ("editor", ""):
+                mgr.clear_active()
+                return ok()
             return mgr.switch(iid)
 
         elif action == "terminate":
