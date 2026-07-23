@@ -21,7 +21,7 @@ JSON-LD Structured Data (Schema.org SoftwareApplication)
   "name": "Open Godot MCP",
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Cross-platform",
-  "softwareVersion": "0.1.9",
+  "softwareVersion": "0.1.10",
   "license": "https://opensource.org/licenses/MIT",
   "description": "開源 Model Context Protocol server，讓 AI 自主開發、測試、除錯 Godot 遊戲。具備確定性 playtesting、連線遊戲測試、DAP 除錯、LSP 整合、Token 效率設計。",
   "url": "https://github.com/masteryee-labs/Open-Godot-MCP",

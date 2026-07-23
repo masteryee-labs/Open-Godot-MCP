@@ -15,6 +15,7 @@ This is distinct from InstanceManager which manages EDITOR instances.
 from __future__ import annotations
 
 import asyncio
+import csv
 import logging
 import os
 import shutil
@@ -28,6 +29,29 @@ from .utils.error_codes import fail, ok
 from .utils.port_resolver import DEFAULT_GAME_PORT, resolve_port
 
 log = logging.getLogger(__name__)
+
+
+def _read_enet_port(project_path: Path) -> int | None:
+    """Read the game's ENet port from Data/CSV/game_settings.csv.
+
+    Looks for a row with category='network' and key='default_port'.
+    Returns the port as int, or None if the file/row is not found.
+    """
+    candidates = [
+        project_path / "Data" / "CSV" / "game_settings.csv",
+        project_path / "data" / "csv" / "game_settings.csv",
+    ]
+    for csv_path in candidates:
+        if not csv_path.exists():
+            continue
+        try:
+            with open(csv_path, newline="", encoding="utf-8-sig") as f:
+                for row in csv.reader(f):
+                    if len(row) >= 3 and row[0] == "network" and row[1] == "default_port":
+                        return int(row[2])
+        except (OSError, ValueError):
+            continue
+    return None
 
 
 @dataclass
@@ -109,6 +133,12 @@ class GameInstanceManager:
         scene: res:// path for the game to load (host: required, client: optional)
         args: {'connect_to': 'ip:port', 'reconnect': bool} for client
         project_path: filesystem path to the Godot project (from editor bridge)
+
+        For client role, args.connect_to is the host's address. The port in
+        connect_to (if any) is the MCP WS port — we replace it with the game's
+        ENet port read from Data/CSV/game_settings.csv so the game connects
+        to the right server. If game_settings.csv is not found, the game's
+        built-in default port is used (OGM_CONNECT_TO is left unset).
         """
         if role not in ("host", "client"):
             return fail("INVALID_ARGUMENT", f"role must be 'host' or 'client', got {role!r}")
@@ -139,7 +169,15 @@ class GameInstanceManager:
                     "INVALID_ARGUMENT",
                     "client role requires args.connect_to (e.g. '127.0.0.1:7070')",
                 )
-            env["OGM_CONNECT_TO"] = connect_to
+            # Extract IP from connect_to and pair it with the game's ENet port.
+            # connect_to may use the MCP WS port (e.g. 7070); the game needs the
+            # ENet port from game_settings.csv (e.g. 8910).
+            enet_port = _read_enet_port(path)
+            ip = connect_to.split(":")[0] if ":" in connect_to else connect_to
+            if enet_port is not None:
+                env["OGM_CONNECT_TO"] = f"{ip}:{enet_port}"
+            else:
+                env["OGM_CONNECT_TO"] = connect_to
             if args.get("reconnect"):
                 env["OGM_RECONNECT"] = "true"
 

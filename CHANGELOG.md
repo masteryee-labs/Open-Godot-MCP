@@ -3,6 +3,16 @@
 All notable changes to Open Godot MCP are documented here.
 One entry per release. Version truth = git history + this file.
 
+## [0.1.10] — 2026-07-23
+
+### Fixed
+
+- **Client 連線 ENet port 自動解析**：client role 啟動時，`args.connect_to` 帶的 port 原本是 MCP WS port（例如 `127.0.0.1:7070`），但遊戲需要連的是 ENet port（例如 `8910`）。現在自動從 `Data/CSV/game_settings.csv` 讀取 `network,default_port` 的值，取代 `connect_to` 的 port，讓遊戲連到正確的 ENet 伺服器。若 `game_settings.csv` 不存在或無對應 row，則沿用原 `connect_to`（遊戲內建預設 port）。
+
+### Tests
+
+- 新增 3 個測試：`_read_enet_port` 找到 port、檔案不存在回 `None`、row 不存在回 `None`。
+
 ## [0.1.9] — 2026-07-23
 
 ### Added

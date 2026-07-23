@@ -144,3 +144,33 @@ def test_switch_to_editor_clears_active():
     result = asyncio.run(net_tool.fn("switch", {"instance_id": "editor"}))
     assert result.get("ok") is True
     assert mgr.active_id is None
+
+
+def test_read_enet_port_finds_port(tmp_path):
+    from open_godot_mcp.game_instance_manager import _read_enet_port
+
+    csv_dir = tmp_path / "Data" / "CSV"
+    csv_dir.mkdir(parents=True)
+    (csv_dir / "game_settings.csv").write_text(
+        "category,key,value,type,desc\nnetwork,default_port,8910,int,test\n",
+        encoding="utf-8",
+    )
+    assert _read_enet_port(tmp_path) == 8910
+
+
+def test_read_enet_port_missing_file(tmp_path):
+    from open_godot_mcp.game_instance_manager import _read_enet_port
+
+    assert _read_enet_port(tmp_path) is None
+
+
+def test_read_enet_port_missing_row(tmp_path):
+    from open_godot_mcp.game_instance_manager import _read_enet_port
+
+    csv_dir = tmp_path / "Data" / "CSV"
+    csv_dir.mkdir(parents=True)
+    (csv_dir / "game_settings.csv").write_text(
+        "category,key,value,type,desc\naudio,volume,80,int,test\n",
+        encoding="utf-8",
+    )
+    assert _read_enet_port(tmp_path) is None
